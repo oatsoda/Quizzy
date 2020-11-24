@@ -1,3 +1,4 @@
+using AutoMapper;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -6,7 +7,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Quizzy.WebApp.Data;
+using Quizzy.WebApp.Data.Startup;
 
 namespace Quizzy.WebApp
 {
@@ -28,6 +29,14 @@ namespace Quizzy.WebApp
                     .AddFluentValidation(c => c.RegisterValidatorsFromAssemblyContaining<Startup>());
 
             services.AddMediatR(typeof(Startup));
+            
+            services.AddAutoMapper(cfg =>
+                                   {
+                                       cfg.ShouldMapField = _ => false;
+                                       //cfg.ShouldMapProperty = pi => pi.SetMethod != null && !pi.SetMethod.IsPrivate;
+                                       cfg.DisableConstructorMapping();
+                                       cfg.ShouldMapMethod = _ => false;
+                                   }, typeof(Startup));
             
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

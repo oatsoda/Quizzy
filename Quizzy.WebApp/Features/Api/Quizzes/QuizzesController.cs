@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -26,36 +25,8 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
         [HttpPost]
         public async Task<IActionResult> Post(Post.Command command)
         {
-            return NotFound();
-        }
-    }
-
-    public class Get
-    {
-        public class Query : IRequest<Result>
-        {
-            public string Code { get; set; }
-        }
-
-        public class Result : Query
-        {
-            public string Name { get; set; }
-        }
-
-        public class Handler : IRequestHandler<Query, Result>
-        {
-            public Task<Result> Handle(Query query, CancellationToken cancellationToken)
-            {
-                return Task.FromResult(new Result { Code = query.Code, Name = "test" });
-            }
-        }
-    }
-
-    public class Post
-    {
-        public class Command
-        {
-
+            var result = await m_Mediator.Send(command);
+            return CreatedAtAction(nameof(Get), new { code = result.Code }, result);
         }
     }
 }

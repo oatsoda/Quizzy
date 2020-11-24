@@ -4,7 +4,7 @@ using Microsoft.Azure.Cosmos.Fluent;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Quizzy.WebApp.Data
+namespace Quizzy.WebApp.Data.Startup
 {
     public static class CosmosDbStartupExtensions
     {
@@ -26,7 +26,7 @@ namespace Quizzy.WebApp.Data
             
             var cosmosClient = scope.ServiceProvider.GetService<CosmosClient>();
             var database = cosmosClient.CreateDatabaseIfNotExistsAsync(QUIZZES_DB_NAME, 400).GetAwaiter().GetResult();
-            database.Database.CreateContainerIfNotExistsAsync(new ContainerProperties(QUIZZES_CONTAINER_NAME, "/partkey"));
+            database.Database.CreateContainerIfNotExistsAsync(new ContainerProperties(QUIZZES_CONTAINER_NAME, "/PartKey"));
         }
     }
 }
