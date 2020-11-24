@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quizzy.WebApp.Data.Startup;
+using Quizzy.WebApp.Errors;
 
 namespace Quizzy.WebApp
 {
@@ -24,9 +25,10 @@ namespace Quizzy.WebApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCosmosDb(Configuration);
-            services.AddControllers()
+            services.AddControllers(c => c.Filters.Add(new ResourceNotFoundExceptionFilter()))
                     .AddFeatureFolders()
                     .AddFluentValidation(c => c.RegisterValidatorsFromAssemblyContaining<Startup>());
+                    
 
             services.AddMediatR(typeof(Startup));
             
