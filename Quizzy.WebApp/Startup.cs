@@ -1,3 +1,5 @@
+using FluentValidation.AspNetCore;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -21,8 +23,12 @@ namespace Quizzy.WebApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCosmosDb(Configuration);
-            services.AddControllersWithViews();
+            services.AddControllers()
+                    .AddFeatureFolders()
+                    .AddFluentValidation(c => c.RegisterValidatorsFromAssemblyContaining<Startup>());
 
+            services.AddMediatR(typeof(Startup));
+            
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -40,7 +46,7 @@ namespace Quizzy.WebApp
             }
             else
             {
-                app.UseExceptionHandler("/Error");
+                //app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -53,20 +59,19 @@ namespace Quizzy.WebApp
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                endpoints.MapControllers();
             });
 
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp";
+            app.MapWhen(
+                        context => !context.Request.Path.StartsWithSegments("/api"),
+                        app2 => app2.UseSpa(spa =>
+                                           {
+                                               spa.Options.SourcePath = "ClientApp";
 
-                if (env.IsDevelopment())
-                {
-                    spa.UseReactDevelopmentServer(npmScript: "start");
-                }
-            });
+                                               if (env.IsDevelopment())
+                                                   spa.UseReactDevelopmentServer(npmScript: "start");
+                                           })
+                       );
         }
     }
 }

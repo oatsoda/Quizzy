@@ -10,8 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="9.3.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.15.0" />
+    <PackageReference Include="OdeToCode.AddFeatureFolders" Version="2.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,26 +26,6 @@
     <None Remove="$(SpaRoot)**" />
     <None Remove="ClientApp\build\**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="ClientApp\build\asset-manifest.json" />
-    <None Remove="ClientApp\build\favicon.ico" />
-    <None Remove="ClientApp\build\index.html" />
-    <None Remove="ClientApp\build\manifest.json" />
-    <None Remove="ClientApp\build\precache-manifest.c281c6be293e538faa771059d42216bc.js" />
-    <None Remove="ClientApp\build\service-worker.js" />
-    <None Remove="ClientApp\build\static\css\2.74189dbb.chunk.css" />
-    <None Remove="ClientApp\build\static\css\2.74189dbb.chunk.css.map" />
-    <None Remove="ClientApp\build\static\css\main.13b298a8.chunk.css" />
-    <None Remove="ClientApp\build\static\css\main.13b298a8.chunk.css.map" />
-    <None Remove="ClientApp\build\static\js\2.25ff7c99.chunk.js" />
-    <None Remove="ClientApp\build\static\js\2.25ff7c99.chunk.js.LICENSE.txt" />
-    <None Remove="ClientApp\build\static\js\2.25ff7c99.chunk.js.map" />
-    <None Remove="ClientApp\build\static\js\main.f827d8b0.chunk.js" />
-    <None Remove="ClientApp\build\static\js\main.f827d8b0.chunk.js.map" />
-    <None Remove="ClientApp\build\static\js\runtime-main.b20756af.js" />
-    <None Remove="ClientApp\build\static\js\runtime-main.b20756af.js.map" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
