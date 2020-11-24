@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quizzy.WebApp.Data.Startup;
 using Quizzy.WebApp.Errors;
+using Quizzy.WebApp.SignalR;
 
 namespace Quizzy.WebApp
 {
@@ -40,6 +41,8 @@ namespace Quizzy.WebApp
                                        cfg.ShouldMapMethod = _ => false;
                                    }, typeof(Startup));
             
+            services.AddSignalR();
+
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -71,10 +74,12 @@ namespace Quizzy.WebApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<QuizHub>("/signalr");
             });
 
             app.MapWhen(
-                        context => !context.Request.Path.StartsWithSegments("/api"),
+                        context => !context.Request.Path.StartsWithSegments("/api") &&
+                                   !context.Request.Path.StartsWithSegments("/signalr"),
                         app2 => app2.UseSpa(spa =>
                                            {
                                                spa.Options.SourcePath = "ClientApp";
