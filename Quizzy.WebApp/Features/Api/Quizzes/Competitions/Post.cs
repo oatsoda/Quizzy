@@ -2,6 +2,7 @@
 using FluentValidation;
 using MediatR;
 using Quizzy.WebApp.Data.Entities;
+using Quizzy.WebApp.DomainInfrastructure;
 using Quizzy.WebApp.Errors;
 using System;
 using System.Threading;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
 {
-    public class Post
+    public class Put
     {
         public class Command : IRequest<Result>
         {

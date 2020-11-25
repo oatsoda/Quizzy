@@ -14,18 +14,20 @@ export function JoinQuiz() {
 
   const handleCodeChange = useCallback((e) => { 
       setCode(e.target.value); 
-      if (e.target.value && e.target.value.toString().length === 8)
+      if (e.target.value && e.target.value.toString().length >= 8)
         setButtonEnabled(true);
+      else
+        setButtonEnabled(false);
     }, 
     []);
 
   const useCode = useCallback(async () => { 
     // TODO: Loading state
-      let quiz = await quizzesApi.getQuiz(code, e => {
+      let competition = await quizzesApi.getCompetition(code, e => {
         setErrorMessage(e);
       });
 
-      if (quiz) 
+      if (competition) 
         history.push(`/quiz/${code}`);
     }, 
     [code, history]);

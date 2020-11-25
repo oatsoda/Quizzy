@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Quizzy.WebApp.Features.Api.Quizzes
+namespace Quizzy.WebApp.DomainInfrastructure
 {
     public abstract class CosmosData
     {
@@ -15,6 +15,7 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
             {
                 { typeof(Quiz), "Quizzes" },
                 { typeof(Competition), "Competitions" },
+                { typeof(Participant), "Competitions" },
             }
             );
 
@@ -23,6 +24,12 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
         protected CosmosData(CosmosClient cosmosClient)
         {
             m_CosmosClient = cosmosClient;
+        }
+
+        protected Container Container<T>()
+        {
+            return m_CosmosClient.GetDatabase(_DATABASE_NAME)
+                .GetContainer(s_TypeContainers[typeof(T)]);
         }
     }
 }

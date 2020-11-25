@@ -1,21 +1,30 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { Container } from 'reactstrap';
-import quizzesApi, { Quiz } from '../api/quizzesApi';
+import quizzesApi from '../api/quizzesApi';
+import { Competition } from "../api/Competition";
 import { ErrorDisplay } from './ErrorDisplay';
+import { Loader } from './Loader';
+import { CreateParticipant } from './CreateParticipant'
 import * as signalR from '@microsoft/signalr'
 
 export function PlayQuiz() {
 
-    let { code } = useParams<{ code: string }>();
+  const history = useHistory();
 
-    const [errorMessage, setError] = useState<string>();
-    const [quiz, setQuiz] = useState<Quiz>();
+  let { code } = useParams<{ code: string }>();
 
-    const hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl("/signalr")
-      .configureLogging(signalR.LogLevel.Information)  
-      .build();
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setError] = useState<string>();
+
+  const [competition, setCompetition] = useState<Competition>();
+  const [participant, setParticipant] = useState<Competition>();
+
+    // const hubConnection = new signalR.HubConnectionBuilder()
+    //   .withUrl("/signalr")
+    //   .withAutomaticReconnect()
+    //   .configureLogging(signalR.LogLevel.Information)  
+    //   .build();
 
     useEffect(() => {
         const fetcher = async (qc: string) => await loadQuiz(qc);
@@ -23,36 +32,41 @@ export function PlayQuiz() {
       }, [code]);
   
     async function loadQuiz(qc: string) : Promise<void> {
-      //setIsLoading(true);
+      setIsLoading(true);
 
-      const q = await quizzesApi.getQuiz(qc, (errMsg) => {setError(errMsg)});
+      const comp = await quizzesApi.getCompetition(qc, (errMsg) => {setError(errMsg)});
       
-      if (q)
+      if (comp)
       {
-          setQuiz(q);
-          startSignalR();
+        setCompetition(comp);
+          //startSignalR();
       }
       
-      //setIsLoading(false);
+      setIsLoading(false);
     }
 
-    const startSignalR = useCallback(() =>  {
+    // const startSignalR = useCallback(() =>  {
 
-          // Starts the SignalR connection
-          hubConnection.start().then(a => {
-            // Once started, invokes the sendConnectionId in our ChatHub inside our ASP.NET Core application.
-            if (hubConnection.connectionId) {
-              hubConnection.invoke("joining", hubConnection.connectionId, "Hello!");
-            }   
-          });
+    //       // Starts the SignalR connection
+    //       hubConnection.start().then(a => {
+    //         // Once started, invokes the sendConnectionId in our ChatHub inside our ASP.NET Core application.
+    //         if (hubConnection.connectionId) {
+    //           hubConnection.invoke("joining", hubConnection.connectionId, "Andrew", quiz?.code);
+    //         }   
+    //       });
 
-    }, [hubConnection]);
+    // }, [hubConnection]);
+    
+    const handleCancelCreateParticipant = useCallback(() => history.push(`/`), [history]);
+    const handleParticipantCreated = useCallback((p) => setParticipant(p), []);
 
     return (
         <Container fluid={true}>
+          <Loader isLoading={isLoading} />
           <ErrorDisplay errorMessage={errorMessage} />
-          <h1>Quiz {quiz?.name}</h1>
-          <QuizRecv hubConnection={hubConnection} />
+          <CreateParticipant visible={competition && !participant ? true : false} competition={competition} onParticipantCreated={handleParticipantCreated} onCancel={handleCancelCreateParticipant}  />
+          <h1>Quiz {competition?.quiz.name}</h1>
+          {/* <QuizRecv hubConnection={hubConnection} /> */}
         </Container>
     );
 }
@@ -62,8 +76,8 @@ export function QuizRecv(props: { hubConnection: signalR.HubConnection}) {
   const [msg, setMsg] = useState<string>();
 
   useEffect(() => {
-    props.hubConnection.on("joined", (user, message) => {
-      setMsg(message + "[" + user + "]");
+    props.hubConnection.on("joined", (name) => {
+      setMsg(name + " joined");
     });
   });
 

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Quizzy.WebApp.Data.Startup;
+using Quizzy.WebApp.DomainInfrastructure;
 using Quizzy.WebApp.Errors;
 using Quizzy.WebApp.Features.Api.Quizzes;
 using Quizzy.WebApp.SignalR;
@@ -54,7 +54,6 @@ namespace Quizzy.WebApp
 
             services.AddSingleton<DataQuery>();
             services.AddSingleton<DataStore>();
-            services.AddSingleton<QuizFetcher>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

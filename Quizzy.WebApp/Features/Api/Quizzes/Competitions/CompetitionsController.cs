@@ -7,11 +7,11 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
 {
     [ApiController]
     [Route("api/quizzes/{quizId}/[controller]")]
-    public class CompetitionsController : ControllerBase
+    public class ParticipantsController : ControllerBase
     {
         private readonly IMediator m_Mediator;
 
-        public CompetitionsController(IMediator mediator)
+        public ParticipantsController(IMediator mediator)
         {
             m_Mediator = mediator;
         }
@@ -24,7 +24,7 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
         }
         
         [HttpPost]
-        public async Task<IActionResult> Post([FromRoute]Guid quizId, Post.Command command)
+        public async Task<IActionResult> Post([FromRoute]Guid quizId, Put.Command command)
         {
             command.QuizId = quizId;
             var result = await m_Mediator.Send(command);

@@ -7,7 +7,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
+namespace Quizzy.WebApp.Features.Api.Competitions
 {
     public class Get
     {
@@ -19,6 +19,16 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
         public class Result : Query
         {
             public Guid QuizId { get; set; }
+
+            public ResultQuiz Quiz { get; set; }
+
+            public class ResultQuiz
+            {
+                public Guid Id { get; set; }
+                public string Name { get; set; }
+                public string CreatorEmail { get; set; }
+                public string CreatorName { get; set; }
+            }
         }
 
         public class Handler : IRequestHandler<Query, Result>
@@ -34,13 +44,20 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
 
             public async Task<Result> Handle(Query query, CancellationToken cancellationToken)
             {                
-                // TODO: Include QuizId in query?
                 var competition = await m_DataQuery.FetchSingle<Competition>(c => c.Code == query.Code, query.Code);
 
                 if (competition == null)
                     throw new ResourceNotFoundException("Competition", nameof(Query.Code), query.Code.ToString());                
                 
-                return m_Mapper.Map<Result>(competition);
+                var quiz = await m_DataQuery.FetchSingle<Quiz>(q => q.Id == competition.QuizId, Quiz.CreatePartitionKeyFromId(competition.QuizId));
+                
+                if (quiz == null)
+                    throw new InvalidOperationException("Competition associted with unknown Quiz"); 
+
+                var result = m_Mapper.Map<Result>(competition);
+                result.Quiz = m_Mapper.Map<Result.ResultQuiz>(quiz);
+
+                return result;
             }
         }
     }
