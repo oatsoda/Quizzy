@@ -18,6 +18,7 @@ namespace Quizzy.WebApp.Features.Api.Competitions
 
         public class Result : Query
         {
+            public CompetitionStatus Status { get; set; }
             public Guid QuizId { get; set; }
 
             public ResultQuiz Quiz { get; set; }
@@ -28,6 +29,14 @@ namespace Quizzy.WebApp.Features.Api.Competitions
                 public string Name { get; set; }
                 public string CreatorEmail { get; set; }
                 public string CreatorName { get; set; }
+            }
+
+            public enum CompetitionStatus
+            {
+                None,
+                WaitingForParticipants,
+                Started,
+                Finished
             }
         }
 

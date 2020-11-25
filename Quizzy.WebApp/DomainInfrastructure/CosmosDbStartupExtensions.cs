@@ -15,7 +15,7 @@ namespace Quizzy.WebApp.DomainInfrastructure
         public static IServiceCollection AddCosmosDb(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
             var connString = configuration.GetConnectionString("CosmosQuizDb");
-            var cosmosClientBuilder = new CosmosClientBuilder(connString);
+            var cosmosClientBuilder = new CosmosClientBuilder(connString); // TODO: Upgrade to v4 once released and change to enums as strings.
             serviceCollection.AddSingleton(cosmosClientBuilder.Build());
 
             return serviceCollection;

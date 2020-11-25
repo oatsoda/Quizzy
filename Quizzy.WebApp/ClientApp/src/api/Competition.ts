@@ -1,6 +1,7 @@
 
 export type Competition = {
   code: string;
+  status: "none" | "waitingForParticipants" | "started" | "finished"
   quizId: string;
   quiz: CompetitionQuiz;
 };

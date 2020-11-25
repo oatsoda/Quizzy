@@ -2,7 +2,8 @@
 {
     public enum CompetitionStatus
     {
-        None,
+        Unknown,
+        New,
         WaitingForParticipants,
         Started,
         Finished

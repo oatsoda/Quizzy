@@ -9,8 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quizzy.WebApp.DomainInfrastructure;
 using Quizzy.WebApp.Errors;
-using Quizzy.WebApp.Features.Api.Quizzes;
 using Quizzy.WebApp.SignalR;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Quizzy.WebApp
@@ -30,9 +30,8 @@ namespace Quizzy.WebApp
             services.AddCosmosDb(Configuration);
             services.AddControllers(c => c.Filters.Add(new ResourceNotFoundExceptionFilter()))
                     .AddFeatureFolders()
-                    .AddFluentValidation(c => c.RegisterValidatorsFromAssemblyContaining<Startup>());
-                //TODO: Check CamelCasing of Enum strings
-                    
+                    .AddFluentValidation(c => c.RegisterValidatorsFromAssemblyContaining<Startup>())
+                    .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));                    
 
             services.AddMediatR(typeof(Startup));
             
