@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos;
-using Quizzy.WebApp.Data.Entities;
-using System.Linq;
+﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
+using Quizzy.WebApp.Data.Entities;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Quizzy.WebApp.Features.Api.Quizzes
 {
@@ -15,7 +16,7 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
             m_CosmosClient = cosmosClient;
         }
 
-        public async Task<Quiz> FetchQuiz(string quizId)
+        public async Task<Quiz> FetchQuiz(Guid quizId)
         {
             var container = m_CosmosClient.GetDatabase("Quizzes").GetContainer("Quizzes");
                 

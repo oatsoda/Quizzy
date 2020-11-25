@@ -1,10 +1,11 @@
-﻿using FluentValidation;
-using System.Threading;
+﻿using AutoMapper;
+using FluentValidation;
 using MediatR;
-using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using Quizzy.WebApp.Data.Entities;
-using AutoMapper;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Quizzy.WebApp.Features.Api.Quizzes
 {
@@ -32,7 +33,7 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
 
         public class Result : Command
         {
-            public string Code { get; set; }
+            public Guid Id { get; set; }
         }
 
         public class Handler : IRequestHandler<Command, Result>

@@ -1,8 +1,9 @@
-﻿using System.Threading;
+﻿using AutoMapper;
 using MediatR;
-using System.Threading.Tasks;
-using AutoMapper;
 using Quizzy.WebApp.Errors;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Quizzy.WebApp.Features.Api.Quizzes
 {
@@ -10,7 +11,7 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
     {
         public class Query : IRequest<Result>
         {
-            public string Code { get; set; }
+            public Guid Id { get; set; }
         }
 
         public class Result : Query
@@ -33,10 +34,10 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
 
             public async Task<Result> Handle(Query query, CancellationToken cancellationToken)
             {                
-                var quiz = await m_QuizFetcher.FetchQuiz(query.Code);
+                var quiz = await m_QuizFetcher.FetchQuiz(query.Id);
 
                 if (quiz == null)
-                    throw new ResourceNotFoundException("Quiz", nameof(Query.Code), query.Code);                
+                    throw new ResourceNotFoundException("Quiz", nameof(Query.Id), query.Id.ToString());                
 
                 return m_Mapper.Map<Result>(quiz);
             }

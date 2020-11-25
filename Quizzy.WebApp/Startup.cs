@@ -9,7 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quizzy.WebApp.Data.Startup;
 using Quizzy.WebApp.Errors;
+using Quizzy.WebApp.Features.Api.Quizzes;
 using Quizzy.WebApp.SignalR;
+using System.Text.Json.Serialization;
 
 namespace Quizzy.WebApp
 {
@@ -29,6 +31,7 @@ namespace Quizzy.WebApp
             services.AddControllers(c => c.Filters.Add(new ResourceNotFoundExceptionFilter()))
                     .AddFeatureFolders()
                     .AddFluentValidation(c => c.RegisterValidatorsFromAssemblyContaining<Startup>());
+                //TODO: Check CamelCasing of Enum strings
                     
 
             services.AddMediatR(typeof(Startup));
@@ -48,6 +51,10 @@ namespace Quizzy.WebApp
             {
                 configuration.RootPath = "ClientApp/build";
             });
+
+            services.AddSingleton<DataQuery>();
+            services.AddSingleton<DataStore>();
+            services.AddSingleton<QuizFetcher>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

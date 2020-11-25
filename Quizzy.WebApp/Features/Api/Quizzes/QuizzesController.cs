@@ -15,10 +15,10 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
             m_Mediator = mediator;
         }
 
-        [HttpGet("{code}")]
-        public async Task<IActionResult> Get(string code)
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> Get([FromRoute]Get.Query query)
         {
-            var result = await m_Mediator.Send(new Get.Query { Code = code });
+            var result = await m_Mediator.Send(query);
             return Ok(result);
         }
 
@@ -26,7 +26,7 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
         public async Task<IActionResult> Post(Post.Command command)
         {
             var result = await m_Mediator.Send(command);
-            return CreatedAtAction(nameof(Get), new { code = result.Code }, result);
+            return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
         }
     }
 }

@@ -10,6 +10,7 @@ namespace Quizzy.WebApp.Data.Startup
     {
         public const string QUIZZES_DB_NAME = "Quizzes";
         public const string QUIZZES_CONTAINER_NAME = "Quizzes";
+        public const string COMPS_CONTAINER_NAME = "Competitions";
 
         public static IServiceCollection AddCosmosDb(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
@@ -25,8 +26,13 @@ namespace Quizzy.WebApp.Data.Startup
             using var scope = app.ApplicationServices.CreateScope();
             
             var cosmosClient = scope.ServiceProvider.GetService<CosmosClient>();
+
             var database = cosmosClient.CreateDatabaseIfNotExistsAsync(QUIZZES_DB_NAME, 400).GetAwaiter().GetResult();
+
             database.Database.CreateContainerIfNotExistsAsync(new ContainerProperties(QUIZZES_CONTAINER_NAME, "/PartKey"));
+            database.Database.CreateContainerIfNotExistsAsync(new ContainerProperties(COMPS_CONTAINER_NAME, "/CompId"));
+
+
         }
     }
 }
