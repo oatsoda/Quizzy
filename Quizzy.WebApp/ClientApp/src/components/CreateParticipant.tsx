@@ -8,13 +8,12 @@ import quizzesApi from '../api/quizzesApi';
 const addPersonModalId: string = "personAddModal";
 
 function CreateParticipant(props: { 
-                            visible: boolean,
                             competition?: Competition,                             
                             onParticipantCreated: (participant: Participant) => void,
                             onCancel: () => void
                         }) {
     
-    const { visible, competition, onParticipantCreated, onCancel } = props;
+    const { competition, onParticipantCreated, onCancel } = props;
     const [isLoading, setIsLoading] = useState(false);
     const [newParticipant, setNewParticipant] = useState<ParticipantNew>(createParticipantNew());
     const [errorMessage, setError] = useState<string>();
@@ -22,7 +21,7 @@ function CreateParticipant(props: {
     useEffect(() => {
         setNewParticipant(createParticipantNew());
         setError(undefined);
-    }, [visible]);
+    }, []);
 
   const saveNewParticipant = useCallback(async () => {
 
@@ -54,7 +53,7 @@ function CreateParticipant(props: {
   return (
     <>
     <Loader isLoading={isLoading} />
-    <Modal isOpen={visible} id={addPersonModalId} labelledBy="addParticipantModalLabel" aria-hidden="true">
+    <Modal isOpen={true} id={addPersonModalId} labelledBy="addParticipantModalLabel" aria-hidden="true">
       <ModalHeader aria-label="addParticipantModalLabel">Join Quiz: "{competition?.quiz.name}"</ModalHeader>
       <ModalBody>
         <Form>

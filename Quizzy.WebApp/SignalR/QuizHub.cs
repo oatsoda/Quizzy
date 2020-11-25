@@ -32,8 +32,7 @@ namespace Quizzy.WebApp.SignalR
         }
 
         public Task Join(Joiner joiner)
-        {
-            
+        {            
             m_Logger.LogInformation($"Joined: {joiner.ParticipantId} [{Context.ConnectionId} {Context.UserIdentifier}]");
 
             // Check quiz exists etc.  Send message to Caller to confirm? (or send message with error?)
