@@ -27,7 +27,7 @@ export function JoinQuiz() {
         setErrorMessage(e);
       });
 
-      if (competition?.status === "none")
+      if (competition?.status === "new")
         setErrorMessage("This quiz has not yet started.  Try again once the organiser has started it.");
       else if (competition?.status === "finished")
         setErrorMessage("This quiz has finished.");

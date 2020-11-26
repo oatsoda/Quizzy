@@ -56,6 +56,7 @@ namespace Quizzy.WebApp
             services.AddSingleton<DataStore>();
             services.AddSingleton<CompetitionCodeGenerator>();
             services.AddSingleton<RandomCodeGenerator>();
+            services.AddSingleton<ParticipantNotifier>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
