@@ -4,8 +4,6 @@ using Quizzy.WebApp.Data.Entities;
 using Quizzy.WebApp.DomainInfrastructure;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Quizzy.WebApp.QuizProcess
@@ -43,6 +41,12 @@ namespace Quizzy.WebApp.QuizProcess
             var liveQuiz = m_LiveQuizzes.GetOrAdd(code, _ => m_LiveQuizFactory());
             return liveQuiz.Join(participant, clientId);
         }
+        
+        public Task AnswerQuestion(Answer answer)
+        {
+            var liveQuiz = m_LiveQuizzes.GetOrAdd(answer.CompetitionCode, _ => m_LiveQuizFactory());
+            return liveQuiz.AnswerQuestion(answer.ParticipantId, answer.QuestionNo, answer.AnswerNo);
+        }
     }
 
     public class LiveQuiz
@@ -52,6 +56,7 @@ namespace Quizzy.WebApp.QuizProcess
         private readonly ParticipantNotifier m_ParticipantNotifier;
         private readonly IMapper m_Mapper;
         private readonly DataQuery m_DataQuery;
+        private readonly DataStore m_DataStore;
         private Competition m_Competition;
         private Quiz m_Quiz;
 
@@ -60,11 +65,12 @@ namespace Quizzy.WebApp.QuizProcess
         private int TotalQuestions => m_Quiz.Questions.Count;
         private int CurrentQuestion => m_Competition.CurrentQuestion;
 
-        public LiveQuiz(ParticipantNotifier participantNotifier, IMapper mapper, DataQuery dataQuery)
+        public LiveQuiz(ParticipantNotifier participantNotifier, IMapper mapper, DataQuery dataQuery, DataStore dataStore)
         {
             m_ParticipantNotifier = participantNotifier;
             m_Mapper = mapper;
             m_DataQuery = dataQuery;
+            m_DataStore = dataStore;
         }
 
         public async Task Open(Competition competition)
@@ -92,6 +98,23 @@ namespace Quizzy.WebApp.QuizProcess
             if (m_Competition.Status == CompetitionStatus.Started)
                 confirmation.Question = GetCurrentQuestion();
             return confirmation;
+        }
+
+        public async Task AnswerQuestion(Guid participantId, int questionNo, int answerNo)
+        {
+            var participant = await m_DataStore.Fetch<Participant>(participantId.ToString(), m_Competition.Code);
+            participant.Answer(questionNo, answerNo, m_Quiz.Questions[questionNo - 1].CorrectA == answerNo);
+            await m_DataStore.Update(participant, participant.Id.ToString(), m_Competition.Code);
+            
+            // TODO: Check if last question
+
+            // TODO: This is just moving on to next question from single person.  Need to add time/check all participants etc.
+            // TODO: Add concurrency checks also?
+            m_Competition.CurrentQuestion++;
+            m_Competition = await m_DataStore.Update(m_Competition, m_Competition.Code, m_Competition.Code);
+
+            
+            await m_ParticipantNotifier.NotifyNextQuestion(m_Competition.Code, GetCurrentQuestion());
         }
 
         private Question GetCurrentQuestion()
@@ -144,6 +167,11 @@ namespace Quizzy.WebApp.QuizProcess
         public Task NotifyStarted(string code, Question firstQuestion)
         {
             return m_HubContext.Clients.Group(code).Started(firstQuestion);
+        }
+
+        public Task NotifyNextQuestion(string code, Question question)
+        {
+            return m_HubContext.Clients.Group(code).NewQuestion(question);
         }
     }
 }

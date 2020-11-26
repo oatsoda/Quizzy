@@ -12,7 +12,7 @@ namespace Quizzy.WebApp.Data.Entities
         public string Discriminator => "Competition";
 
         public CompetitionStatus Status { get; private set; }
-        public int CurrentQuestion { get; private set; }
+        public int CurrentQuestion { get; set; }
 
         public Guid QuizId { get; set; }
 
@@ -24,11 +24,10 @@ namespace Quizzy.WebApp.Data.Entities
         }
 
         [JsonConstructor]
-        private Competition(string code, CompetitionStatus status, int currentQuestion, Guid quizId)
+        private Competition(string code, CompetitionStatus status, Guid quizId)
         {
             Code = code;
             Status = status;
-            CurrentQuestion = currentQuestion;
             QuizId = quizId;
         }
 

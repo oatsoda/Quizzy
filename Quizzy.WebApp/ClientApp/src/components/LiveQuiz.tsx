@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { HubConnectionBuilder, HubConnection, LogLevel } from '@microsoft/signalr';
 import { Competition, Participant } from '../api/Competition';
 import { ErrorDisplay } from './ErrorDisplay';
@@ -10,7 +10,7 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
   
   const [errorMessage, setError] = useState<string>();
   const [hubConnection, setHubConnection] = useState<HubConnection>();
-  const [playState, setPlayState] = useState<PlayState>({ status: "connecting" });
+  const [playState, setPlayState] = useState<PlayState>({ status: "connecting", answered: false });
   //const [status, setStatus] = useState<"connecting" | "connected" | "joined" | "started">("connecting");
   //const [questionTotals, setQuestionTotals] = useState<{ current: number, total: number }>();
 
@@ -30,7 +30,7 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
     if (hubConnection) {
 
       hubConnection.on("joinConfirmed", (r: { participants: { id: string, name: string, connected: boolean }[], question?: Question }) => {   
-        setPlayState(prev => ({...prev, status: "joined", question: r.question}));
+        setPlayState(prev => ({ ...prev, status: "joined", question: r.question }));
       });
 
       hubConnection.on("joinFailed", (e: { errorMessage: string }) => {                  
@@ -38,7 +38,11 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
       });
       
       hubConnection.on("started", (q: Question) => {  
-        setPlayState({ status: "joined", question: q });
+        setPlayState({ status: "joined", question: q, answered: false });
+      });
+      
+      hubConnection.on("newQuestion", (q: Question) => {  
+        setPlayState(prev => ({ ...prev, question: q, answered: false }));
       });
 
       hubConnection.start()
@@ -50,6 +54,15 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
     }
   }, [hubConnection, participant.id, competition.code]);
   
+  const handleAnswer = useCallback(
+    (e) => {        
+      setPlayState(prev => ({ ...prev, answered: false }));
+      console.log("ANSWER: " + participant.id + " / " + competition.code + " @ " + playState.question?.no + " - " + e.target.name);
+      hubConnection!.invoke("answerQuestion", { participantId: participant.id, competitionCode: competition.code, questionNo: playState.question!.no, answerNo: Number(e.target.name) });
+    },
+    [competition.code, hubConnection, participant.id, playState.question]
+  );
+
   return (
     <div>
       <h3>{playState.status}</h3>
@@ -60,18 +73,18 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
         <h4>{playState.question.q}</h4>
         <Row className="mb-3">
           <Col xl={6} >
-            <Card><CardBody>A <Button color="link" className="stretched-link">{playState.question.a1}</Button></CardBody></Card>
+            <Card><CardBody>A <Button color="link" className="stretched-link" name="1" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a1}</Button></CardBody></Card>
           </Col>
           <Col xl={6}>
-            <Card><CardBody>B <Button color="link" className="stretched-link">{playState.question.a2}</Button></CardBody></Card>
+            <Card><CardBody>B <Button color="link" className="stretched-link" name="2" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a2}</Button></CardBody></Card>
           </Col>
         </Row>
         <Row className="mb-3">
           <Col xl={6}>
-            <Card><CardBody>C <Button color="link" className="stretched-link">{playState.question.a3}</Button></CardBody></Card>
+            <Card><CardBody>C <Button color="link" className="stretched-link" name="3" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a3}</Button></CardBody></Card>
           </Col>
           <Col xl={6}>
-            <Card><CardBody>D <Button color="link" className="stretched-link">{playState.question.a4}</Button></CardBody></Card>
+            <Card><CardBody>D <Button color="link" className="stretched-link" name="4" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a4}</Button></CardBody></Card>
           </Col>
         </Row>
       </Container>
@@ -82,7 +95,8 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
 
 type PlayState = {
   status: "connecting" | "connected" | "joined" | "started",
-  question?: Question
+  question?: Question,
+  answered: boolean
 }
 
 type Question = {

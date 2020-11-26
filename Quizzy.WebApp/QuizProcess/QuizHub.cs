@@ -62,10 +62,10 @@ namespace Quizzy.WebApp.QuizProcess
             // TODO: Broadcast participant list/state changed
         }
 
-        //public Task AnswerQuestion(Answer answer)
-        //{
-
-        //}
+        public Task AnswerQuestion(Answer answer)
+        {
+            return m_LiveQuizzes.AnswerQuestion(answer);
+        }
     }
     
     public interface IQuizHub
@@ -82,7 +82,7 @@ namespace Quizzy.WebApp.QuizProcess
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public bool Connected { get; set; }
+        //public bool Connected { get; set; }
     }
 
     public class ParticipantList
@@ -93,7 +93,7 @@ namespace Quizzy.WebApp.QuizProcess
     public class Joiner
     {
         public string CompetitionCode { get; set; }
-        public Guid ParticipantId { get; set;}
+        public Guid ParticipantId { get; set; }
     }
 
     public class JoinConfirmed
@@ -110,7 +110,9 @@ namespace Quizzy.WebApp.QuizProcess
 
     public class Answer
     {
-        public string QuestionNo { get; set; }
+        public string CompetitionCode { get; set; }
+        public Guid ParticipantId { get; set; }
+        public int QuestionNo { get; set; }
         public int AnswerNo { get; set; }
     }
 
