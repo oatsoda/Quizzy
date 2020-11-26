@@ -13,21 +13,13 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
     {
         public class Query : IRequest<Result>
         {
+            public Guid QuizId { get; set; }
             public string Code { get; set; }
         }
 
         public class Result : Query
         {
-            public Guid QuizId { get; set; }
             public CompetitionStatus Status { get; set; }
-
-            public enum CompetitionStatus
-            {
-                None,
-                WaitingForParticipants,
-                Started,
-                Finished
-            }
         }
 
         public class Handler : IRequestHandler<Query, Result>
@@ -43,12 +35,14 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
 
             public async Task<Result> Handle(Query query, CancellationToken cancellationToken)
             {                
-                // TODO: Include QuizId in query?
                 var competition = await m_DataQuery.FetchSingle<Competition>(c => c.Code == query.Code, query.Code);
 
                 if (competition == null)
-                    throw new ResourceNotFoundException("Competition", nameof(Query.Code), query.Code.ToString());                
-                
+                    throw new ResourceNotFoundException("Competition", nameof(Query.Code), query.Code.ToString());
+                                
+                if (competition.QuizId != query.QuizId)
+                    throw new ResourceNotFoundException("Competition", "QuizId", query.QuizId.ToString());
+
                 return m_Mapper.Map<Result>(competition);
             }
         }

@@ -30,14 +30,6 @@ namespace Quizzy.WebApp.Features.Api.Competitions
                 public string CreatorEmail { get; set; }
                 public string CreatorName { get; set; }
             }
-
-            public enum CompetitionStatus
-            {
-                None,
-                WaitingForParticipants,
-                Started,
-                Finished
-            }
         }
 
         public class Handler : IRequestHandler<Query, Result>

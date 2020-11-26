@@ -4,7 +4,7 @@
     {
         Unknown,
         New,
-        WaitingForParticipants,
+        Open,
         Started,
         Finished
     }

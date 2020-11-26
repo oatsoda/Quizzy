@@ -28,6 +28,7 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
         public class Result : Command
         {
             public string Code { get; set; }
+            public CompetitionStatus Status { get; set; }
         }
 
         public class Handler : IRequestHandler<Command, Result>
@@ -49,7 +50,7 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
             {
                 // Validate QuizId
                 if (!await m_DataQuery.Exists<Quiz>(q => q.Id == command.QuizId, Quiz.CreatePartitionKeyFromId(command.QuizId)))
-                    throw new ResourceNotFoundException("Quiz", "Id", command.QuizId.ToString()); // TODO: Change to BadRequest
+                    throw new ResourceNotFoundException("Quiz", "Id", command.QuizId.ToString());
 
                 var competition = await Task.Run(() => new Competition(command.QuizId, m_CompetitionCodeGenerator));
                 competition = m_Mapper.Map(command, competition);
