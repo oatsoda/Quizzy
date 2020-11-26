@@ -3,7 +3,7 @@ using MediatR;
 using Quizzy.WebApp.Data.Entities;
 using Quizzy.WebApp.DomainInfrastructure;
 using Quizzy.WebApp.Errors;
-using Quizzy.WebApp.SignalR;
+using Quizzy.WebApp.QuizProcess;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,12 +28,12 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
         public class Handler : AsyncRequestHandler<Command>
         {
             private readonly DataStore m_DataStore;
-            private readonly ParticipantNotifier m_ParticipantNotifier;
+            private readonly LiveQuizzes m_LiveQuizzes;
 
-            public Handler(DataStore dataStore, ParticipantNotifier participantNotifier)
+            public Handler(DataStore dataStore, LiveQuizzes liveQuizzes)
             {
                 m_DataStore = dataStore;
-                m_ParticipantNotifier = participantNotifier;
+                m_LiveQuizzes = liveQuizzes;
             }
 
             protected override async Task Handle(Command command, CancellationToken cancellationToken)
@@ -46,12 +46,10 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
                 if (competition.QuizId != command.QuizId)
                     throw new ResourceNotFoundException("Competition", "QuizId", command.QuizId.ToString());
 
-                var quiz = await m_DataStore.Fetch<Quiz>(competition.QuizId.ToString(), Quiz.CreatePartitionKeyFromId(competition.QuizId));
-
                 competition.Start();
                 await m_DataStore.Update(competition, competition.Code, competition.Code);
 
-                await m_ParticipantNotifier.NotifyStarted(competition, quiz);
+                await m_LiveQuizzes.StartQuiz(competition);
             }
         }
     }

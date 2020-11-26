@@ -7,16 +7,18 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Quizzy.WebApp.SignalR
+namespace Quizzy.WebApp.QuizProcess
 {
     public class QuizHub : Hub<IQuizHub>
     {
         private DataQuery m_DataQuery;
+        private readonly LiveQuizzes m_LiveQuizzes;
         private ILogger<QuizHub> m_Logger;
 
-        public QuizHub(DataQuery dataQuery, ILogger<QuizHub> logger)
+        public QuizHub(DataQuery dataQuery, LiveQuizzes liveQuizzes, ILogger<QuizHub> logger)
         {
             m_DataQuery = dataQuery;
+            m_LiveQuizzes = liveQuizzes;
             m_Logger = logger;
         }
 
@@ -50,10 +52,12 @@ namespace Quizzy.WebApp.SignalR
             // Add to Group by Quiz Code
             Groups.AddToGroupAsync(Context.ConnectionId, participant.CompId);
 
-            // TODO: Record SignalR ConnectionId ? 
+            //var competition = m_DataQuery.FetchSingle<Competition>(c => c.Code == participant.CompId, participant.CompId).GetAwaiter().GetResult();
+
+            var response = m_LiveQuizzes.JoinQuiz(joiner.CompetitionCode, participant, Context.ConnectionId).GetAwaiter().GetResult();
 
             // Send success to client
-            return Clients.Caller.JoinConfirmed(new ParticipantList());
+            return Clients.Caller.JoinConfirmed(response);
 
             // TODO: Broadcast participant list/state changed
         }
@@ -66,7 +70,7 @@ namespace Quizzy.WebApp.SignalR
     
     public interface IQuizHub
     {
-        Task JoinConfirmed(ParticipantList participants);
+        Task JoinConfirmed(JoinConfirmed joinConfirmed);
         Task JoinFailed(Error participant);
         Task ParticipantListChanged(ParticipantList participants);
 
@@ -92,10 +96,24 @@ namespace Quizzy.WebApp.SignalR
         public Guid ParticipantId { get; set;}
     }
 
+    public class JoinConfirmed
+    {
+        public ParticipantList Participants { get; set; }
+        public Question Question { get; set; }
+    }
+
     public class Error
     {
         public string ErrorMessage { get; set; }
     }
+
+
+    public class Answer
+    {
+        public string QuestionNo { get; set; }
+        public int AnswerNo { get; set; }
+    }
+
 
     public class Question
     {
@@ -107,33 +125,6 @@ namespace Quizzy.WebApp.SignalR
         public int No { get; set; }
         public int Total { get; set; }
     }
-
-    public class Answer
-    {
-        public string QuestionNo { get; set; }
-        public int AnswerNo { get; set; }
-    }
-
-    public class ParticipantNotifier
-    {
-        private readonly IHubContext<QuizHub, IQuizHub> m_HubContext;
-        private readonly IMapper m_Mapper;
-
-        public ParticipantNotifier(IHubContext<QuizHub, IQuizHub> hubContext, IMapper mapper)
-        {
-            m_HubContext = hubContext;
-            m_Mapper = mapper;
-        }
-
-        public Task NotifyStarted(Competition competition, Quiz quiz)
-        {
-            var question = m_Mapper.Map<Question>(quiz.Questions[0]);
-            question.No = 1;
-            question.Total = quiz.Questions.Count;
-            return m_HubContext.Clients.Group(competition.Code).Started(question);
-        }
-    }
-    
 
     public class MappingProfile : Profile
     {

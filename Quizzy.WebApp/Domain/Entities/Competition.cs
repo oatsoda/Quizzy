@@ -10,7 +10,9 @@ namespace Quizzy.WebApp.Data.Entities
         public string Code { get; }
         public string CompId => Code;
         public string Discriminator => "Competition";
+
         public CompetitionStatus Status { get; private set; }
+        public int CurrentQuestion { get; private set; }
 
         public Guid QuizId { get; set; }
 
@@ -22,10 +24,11 @@ namespace Quizzy.WebApp.Data.Entities
         }
 
         [JsonConstructor]
-        private Competition(string code, CompetitionStatus status, Guid quizId)
+        private Competition(string code, CompetitionStatus status, int currentQuestion, Guid quizId)
         {
             Code = code;
             Status = status;
+            CurrentQuestion = currentQuestion;
             QuizId = quizId;
         }
 
@@ -43,6 +46,7 @@ namespace Quizzy.WebApp.Data.Entities
                 throw new InvalidOperationException($"Cannot Start when status is not Open. Status is '{Status}'");
 
             Status = CompetitionStatus.Started;
+            CurrentQuestion = 1;
         }
         
         public void Finish() 

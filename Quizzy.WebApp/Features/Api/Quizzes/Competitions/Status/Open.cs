@@ -3,6 +3,7 @@ using MediatR;
 using Quizzy.WebApp.Data.Entities;
 using Quizzy.WebApp.DomainInfrastructure;
 using Quizzy.WebApp.Errors;
+using Quizzy.WebApp.QuizProcess;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,10 +28,12 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
         public class Handler : AsyncRequestHandler<Command>
         {
             private readonly DataStore m_DataStore;
+            private readonly LiveQuizzes m_LiveQuizzes;
 
-            public Handler(DataStore dataStore)
+            public Handler(DataStore dataStore, LiveQuizzes liveQuizzes)
             {
                 m_DataStore = dataStore;
+                m_LiveQuizzes = liveQuizzes;
             }
 
             protected override async Task Handle(Command command, CancellationToken cancellationToken)
@@ -45,6 +48,8 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
 
                 competition.Open();
                 await m_DataStore.Update(competition, competition.Code, competition.Code);
+                
+                await m_LiveQuizzes.OpenQuiz(competition);
             }
         }
     }

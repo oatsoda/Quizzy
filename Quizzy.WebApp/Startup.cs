@@ -10,7 +10,8 @@ using Microsoft.Extensions.Hosting;
 using Quizzy.WebApp.DomainInfrastructure;
 using Quizzy.WebApp.DomainServices;
 using Quizzy.WebApp.Errors;
-using Quizzy.WebApp.SignalR;
+using Quizzy.WebApp.QuizProcess;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -57,6 +58,9 @@ namespace Quizzy.WebApp
             services.AddSingleton<CompetitionCodeGenerator>();
             services.AddSingleton<RandomCodeGenerator>();
             services.AddSingleton<ParticipantNotifier>();
+            services.AddSingleton<LiveQuizzes>();
+            services.AddTransient<LiveQuiz>();
+            services.AddSingleton<Func<LiveQuiz>>(sp => () => sp.GetService<LiveQuiz>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
