@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using Quizzy.WebApp.Domain.AbstractServices;
 
 namespace Quizzy.WebApp.Data.Entities
 {
@@ -13,9 +14,9 @@ namespace Quizzy.WebApp.Data.Entities
 
         public Guid QuizId { get; set; }
 
-        public Competition(Guid quizId)
+        public Competition(Guid quizId, ICompetitionCodeGenerator competitionCodeGenerator)
         {
-            Code = Guid.NewGuid().ToString(); // TODO: Make shorter, friendlier
+            Code = competitionCodeGenerator.GenerateUniqueCode();
             Status = default;
             QuizId = quizId;
         }

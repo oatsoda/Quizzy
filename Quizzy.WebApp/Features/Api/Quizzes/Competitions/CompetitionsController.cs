@@ -7,11 +7,11 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
 {
     [ApiController]
     [Route("api/quizzes/{quizId}/[controller]")]
-    public class ParticipantsController : ControllerBase
+    public class CompetitionsController : ControllerBase
     {
         private readonly IMediator m_Mediator;
 
-        public ParticipantsController(IMediator mediator)
+        public CompetitionsController(IMediator mediator)
         {
             m_Mediator = mediator;
         }

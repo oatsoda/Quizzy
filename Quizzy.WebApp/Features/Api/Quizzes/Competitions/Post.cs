@@ -3,6 +3,7 @@ using FluentValidation;
 using MediatR;
 using Quizzy.WebApp.Data.Entities;
 using Quizzy.WebApp.DomainInfrastructure;
+using Quizzy.WebApp.DomainServices;
 using Quizzy.WebApp.Errors;
 using System;
 using System.Threading;
@@ -34,12 +35,14 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
             private readonly DataStore m_DataStore;
             private readonly DataQuery m_DataQuery;
             private readonly IMapper m_Mapper;
+            private readonly CompetitionCodeGenerator m_CompetitionCodeGenerator;
 
-            public Handler(DataStore dataStore, DataQuery dataQuery, IMapper mapper)
+            public Handler(DataStore dataStore, DataQuery dataQuery, IMapper mapper, CompetitionCodeGenerator competitionCodeGenerator)
             {
                 m_DataStore = dataStore;
                 m_DataQuery = dataQuery;
                 m_Mapper = mapper;
+                m_CompetitionCodeGenerator = competitionCodeGenerator;
             }
 
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
@@ -48,7 +51,7 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
                 if (!await m_DataQuery.Exists<Quiz>(q => q.Id == command.QuizId, Quiz.CreatePartitionKeyFromId(command.QuizId)))
                     throw new ResourceNotFoundException("Quiz", "Id", command.QuizId.ToString()); // TODO: Change to BadRequest
 
-                var competition = new Competition(command.QuizId);
+                var competition = await Task.Run(() => new Competition(command.QuizId, m_CompetitionCodeGenerator));
                 competition = m_Mapper.Map(command, competition);
 
                 competition = await m_DataStore.Create(competition, competition.CompId);

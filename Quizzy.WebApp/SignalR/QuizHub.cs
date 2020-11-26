@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using Quizzy.WebApp.Data.Entities;
 using Quizzy.WebApp.DomainInfrastructure;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Quizzy.WebApp.SignalR
@@ -27,7 +29,7 @@ namespace Quizzy.WebApp.SignalR
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             m_Logger.LogWarning($"Disconnected: {Context.ConnectionId} {Context.UserIdentifier} {exception?.ToString()}");
-
+                        
             await base.OnDisconnectedAsync(exception);
         }
 
@@ -35,29 +37,78 @@ namespace Quizzy.WebApp.SignalR
         {            
             m_Logger.LogInformation($"Joined: {joiner.ParticipantId} [{Context.ConnectionId} {Context.UserIdentifier}]");
 
-            // Check quiz exists etc.  Send message to Caller to confirm? (or send message with error?)
-            //Clients.Caller.
+            var participant = m_DataQuery.FetchSingle<Participant>(p => p.Id == joiner.ParticipantId, joiner.CompetitionCode).GetAwaiter().GetResult();
 
+            if (participant == null)
+            {
+                // Send failure to client
+                Clients.Caller.JoinFailed(new Error { ErrorMessage = "Could not find Participant" });
+                return Task.CompletedTask;
+            }
+            
             // Add to Group by Quiz Code
+            Groups.AddToGroupAsync(Context.ConnectionId, participant.CompId);
 
-            // Filter by quizCode
-            return Clients.All.Joined(new Participant { Id = joiner.ParticipantId } );
+            // TODO: Record SignalR ConnectionId ? 
+
+            // Send success to client
+            return Clients.Caller.JoinConfirmed(new ParticipantList());
+
+            // TODO: Broadcast participant list/state changed
         }
+
+        //public Task AnswerQuestion(Answer answer)
+        //{
+
+        //}
     }
     
     public interface IQuizHub
     {
-        Task Joined(Participant participant);
+        Task JoinConfirmed(ParticipantList participants);
+        Task JoinFailed(Error participant);
+        Task ParticipantListChanged(ParticipantList participants);
+
+        Task NewQuestion(Question question);
     }
 
-    public class Participant
+    public class LiveParticipant
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public bool Connected { get; set; }
+    }
+
+    public class ParticipantList
+    {        
+        public List<LiveParticipant> Participants { get; set; }
     }
 
     public class Joiner
     {
+        public string CompetitionCode { get; set; }
         public Guid ParticipantId { get; set;}
+    }
+
+    public class Error
+    {
+        public string ErrorMessage { get; set; }
+    }
+
+    public class Question
+    {
+        public string Q { get; set; }
+        public string a1 { get; set; }
+        public string a2 { get; set; }
+        public string a3 { get; set; }
+        public string a4 { get; set; }
+        public int No { get; set; }
+        public int Total { get; set; }
+    }
+
+    public class Answer
+    {
+        public string QuestionNo { get; set; }
+        public int AnswerNo { get; set; }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quizzy.WebApp.DomainInfrastructure;
+using Quizzy.WebApp.DomainServices;
 using Quizzy.WebApp.Errors;
 using Quizzy.WebApp.SignalR;
 using System.Text.Json;
@@ -53,6 +54,8 @@ namespace Quizzy.WebApp
 
             services.AddSingleton<DataQuery>();
             services.AddSingleton<DataStore>();
+            services.AddSingleton<CompetitionCodeGenerator>();
+            services.AddSingleton<RandomCodeGenerator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

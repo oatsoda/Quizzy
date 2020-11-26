@@ -19,6 +19,15 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
         public class Result : Query
         {
             public Guid QuizId { get; set; }
+            public CompetitionStatus Status { get; set; }
+
+            public enum CompetitionStatus
+            {
+                None,
+                WaitingForParticipants,
+                Started,
+                Finished
+            }
         }
 
         public class Handler : IRequestHandler<Query, Result>
