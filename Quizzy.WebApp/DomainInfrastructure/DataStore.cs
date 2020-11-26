@@ -18,5 +18,11 @@ namespace Quizzy.WebApp.DomainInfrastructure
             var response = await Container<T>().UpsertItemAsync(item, new PartitionKey(partitionKey));
             return response.Resource;
         }
+        
+        public async Task<T> Update<T>(T item, string id, string partitionKey)
+        {
+            var response = await Container<T>().ReplaceItemAsync(item, id, new PartitionKey(partitionKey));
+            return response.Resource;
+        }
     }
 }
