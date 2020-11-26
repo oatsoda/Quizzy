@@ -139,12 +139,7 @@ namespace Quizzy.WebApp.SignalR
     {
         public MappingProfile()
         {
-            CreateMap<QuizQuestion, Question>()
-                .ForMember(dest => dest.Q, x => x.MapFrom(src => src.Question))
-                .ForMember(dest => dest.A1, x => x.MapFrom(src => src.Answer1))
-                .ForMember(dest => dest.A2, x => x.MapFrom(src => src.Answer2))
-                .ForMember(dest => dest.A3, x => x.MapFrom(src => src.Answer3))
-                .ForMember(dest => dest.A4, x => x.MapFrom(src => src.Answer4));
+            CreateMap<QuizQuestion, Question>();
         }
     }
 

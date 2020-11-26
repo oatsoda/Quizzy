@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace Quizzy.WebApp.Features.Api.Quizzes
@@ -27,6 +28,14 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
         {
             var result = await m_Mediator.Send(command);
             return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put([FromRoute]Guid id, Put.Command command)
+        {
+            command.Id = id;
+            var result = await m_Mediator.Send(command);
+            return Ok(result);
         }
     }
 }

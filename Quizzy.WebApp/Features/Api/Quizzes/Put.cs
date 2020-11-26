@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 
 namespace Quizzy.WebApp.Features.Api.Quizzes
 {
-    public class Post
+    public class Put
     {
         public class Command : IRequest<Result>
         {
+            public Guid Id { get; set; }
             public string Name { get; set; }
             public string CreatorEmail { get; set; }
             public string CreatorName { get; set; }
@@ -42,12 +43,14 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
                     .NotEmpty();
                 RuleFor(c => c.CreatorName)
                     .NotEmpty();
+                RuleFor(c => c.Questions)
+                    .NotEmpty();
+                // Child rules
             }
         }
 
         public class Result : Command
         {
-            public Guid Id { get; set; }
         }
 
         public class Handler : IRequestHandler<Command, Result>
@@ -63,10 +66,11 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
 
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
-                var quiz = new Quiz(command.Name, command.CreatorEmail);
+                var quiz = await m_DataStore.Fetch<Quiz>(command.Id.ToString(), Quiz.CreatePartitionKeyFromId(command.Id));
+
                 quiz = m_Mapper.Map(command, quiz);
 
-                quiz = await m_DataStore.Create(quiz, quiz.PartKey);
+                quiz = await m_DataStore.Update(quiz, quiz.Id.ToString(), quiz.PartKey);
                 
                 return m_Mapper.Map<Result>(quiz);
             }

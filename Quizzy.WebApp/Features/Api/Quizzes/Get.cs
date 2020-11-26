@@ -4,6 +4,7 @@ using Quizzy.WebApp.Data.Entities;
 using Quizzy.WebApp.DomainInfrastructure;
 using Quizzy.WebApp.Errors;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,6 +22,18 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
             public string Name { get; set; }
             public string CreatorEmail { get; set; }
             public string CreatorName { get; set; }
+
+            public List<Question> Questions { get; set; }
+
+            public class Question
+            {
+                public string Q { get; set; }
+                public string A1 { get; set; }
+                public string A2 { get; set; }
+                public string A3 { get; set; }
+                public string A4 { get; set; }
+                public int CorrectA { get; set; }
+            }
         }
 
         public class Handler : IRequestHandler<Query, Result>
