@@ -19,8 +19,8 @@ function CreateParticipant(props: {
     const [errorMessage, setError] = useState<string>();
   
     useEffect(() => {
-        setNewParticipant(createParticipantNew());
-        setError(undefined);
+      setNewParticipant(createParticipantNew());
+      setError(undefined);
     }, []);
 
   const saveNewParticipant = useCallback(async () => {
