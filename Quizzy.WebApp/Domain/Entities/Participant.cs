@@ -7,10 +7,12 @@ namespace Quizzy.WebApp.Data.Entities
 {
     public class Participant
     {
+        public const string DiscriminatorValue = "Participant";
+
         [JsonProperty("id")]
         public Guid Id { get; }
         public string CompId { get; }
-        public string Discriminator => "Participant";
+        public string Discriminator => DiscriminatorValue;
 
         public string Email { get; }
         public string Name { get; set; }
@@ -18,8 +20,8 @@ namespace Quizzy.WebApp.Data.Entities
         public int TotalAnswers { get; private set; }
         public int CorrectAnswers { get; private set; }
 
+        // TODO: Make read only 
         public Dictionary<int, ParticipantAnswer> Answers { get; }
-
 
         public Participant(string competitionCode, string email)
         {

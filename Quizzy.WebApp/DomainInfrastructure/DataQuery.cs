@@ -16,7 +16,7 @@ namespace Quizzy.WebApp.DomainInfrastructure
             var container = m_CosmosClient.GetDatabase(_DATABASE_NAME)
                                           .GetContainer(s_TypeContainers[typeof(T)]);
 
-            var feedIterator = container.GetItemLinqQueryable<T>(requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(partitionKey), MaxItemCount = 1 })
+            var feedIterator = container.GetItemLinqQueryable<T>(requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(partitionKey), MaxItemCount = 2 })
                 .Where(filter)
                 .ToFeedIterator();
 
@@ -28,15 +28,43 @@ namespace Quizzy.WebApp.DomainInfrastructure
         }
 
         public async Task<bool> Exists<T>(Expression<Func<T, bool>> filter, string partitionKey) where T : class
+        {            
+            return await Count(filter, partitionKey) > 0;
+        }
+        
+        public async Task<int> Count<T>(Expression<Func<T, bool>> filter, string partitionKey) where T : class
         {
             var container = m_CosmosClient.GetDatabase(_DATABASE_NAME)
                                           .GetContainer(s_TypeContainers[typeof(T)]);
 
-            var count = await container.GetItemLinqQueryable<T>(requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(partitionKey), MaxItemCount = 1 })
+            var count = await container.GetItemLinqQueryable<T>(requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(partitionKey) })
                 .Where(filter)
                 .CountAsync();
 
-            return count.Resource > 0;
+            return count.Resource;
+        }
+
+        
+        public async Task<TValue> FetchSingle<TContainer, TValue>(QueryDefinition queryDefinition, string partitionKey)
+        {
+            var container = m_CosmosClient.GetDatabase(_DATABASE_NAME)
+                                          .GetContainer(s_TypeContainers[typeof(TContainer)]);
+
+            using var feedIterator = container.GetItemQueryIterator<TValue>(queryDefinition, requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(partitionKey), MaxItemCount = 1 });
+
+            if (!feedIterator.HasMoreResults)
+                return default;
+
+            var results = await feedIterator.ReadNextAsync();
+            return results.SingleOrDefault();
+        }
+
+        private IOrderedQueryable<T> GetQueryable<T>(string partitionKey, int itemsPerPage = 20) where T : class
+        {
+            var container = m_CosmosClient.GetDatabase(_DATABASE_NAME)
+                                          .GetContainer(s_TypeContainers[typeof(T)]);
+
+            return container.GetItemLinqQueryable<T>(requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(partitionKey), MaxItemCount = itemsPerPage });            
         }
     }
 }

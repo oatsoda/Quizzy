@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Azure.Cosmos;
 using Quizzy.WebApp.Data.Entities;
 using Quizzy.WebApp.DomainInfrastructure;
 using System;
@@ -64,6 +65,7 @@ namespace Quizzy.WebApp.QuizProcess
 
         private int TotalQuestions => m_Quiz.Questions.Count;
         private int CurrentQuestion => m_Competition.CurrentQuestion;
+        private bool IsLastQuestion => CurrentQuestion == TotalQuestions;
 
         public LiveQuiz(ParticipantNotifier participantNotifier, IMapper mapper, DataQuery dataQuery, DataStore dataStore)
         {
@@ -104,32 +106,25 @@ namespace Quizzy.WebApp.QuizProcess
         {
             var participant = await m_DataStore.Fetch<Participant>(participantId.ToString(), m_Competition.Code);
             participant.Answer(questionNo, answerNo, m_Quiz.Questions[questionNo - 1].CorrectA == answerNo);
-            await m_DataStore.Update(participant, participant.Id.ToString(), m_Competition.Code);
             
-            // TODO: This is just moving on to next question (or finishing) from single person.  Need to add time/check all participants etc.
+            // TODO: This lock is not distributed across all server instances. If we added timer to move to
+            // next question (someone disconnected not answering) then would we change this anyway?
+            lock (m_Locker)
+            {
+                // Avoid race condition here as two (final) answers would both check AllAnswered and both could then trigger
+                // MoveToNextQuestion (because both have already updated DB)
 
-            var finished = m_Competition.CurrentQuestion == m_Quiz.Questions.Count;
-            if (finished)
-            {
-                m_Competition.Finish();
-            }
-            else
-            {
-                m_Competition.CurrentQuestion++;
-            }
+                m_DataStore.Update(participant, participant.Id.ToString(), m_Competition.Code).GetAwaiter().GetResult();
             
-            // TODO: Add concurrency checks also?
-            m_Competition = await m_DataStore.Update(m_Competition, m_Competition.Code, m_Competition.Code);
-                        
-            if (finished)
-            {
-                await m_ParticipantNotifier.NotifyFinished(m_Competition.Code);
+                if (!AllAnswered().GetAwaiter().GetResult())
+                    return;
             }
-            else
-            {
-                await m_ParticipantNotifier.NotifyNextQuestion(m_Competition.Code, GetCurrentQuestion());
-            }
-            
+
+            // If this is the Last Participant to Answers, move on to next, else finish
+            if (IsLastQuestion)            
+                await Finish();            
+            else            
+                await MoveToNextQuestion();
         }
 
         private Question GetCurrentQuestion()
@@ -156,6 +151,33 @@ namespace Quizzy.WebApp.QuizProcess
                     }
                 }
             }
+        }
+
+        private async Task<bool> AllAnswered()
+        {
+            // TODO: Why is quNo param not working (Due to double quotes?)
+            var query = new QueryDefinition($"SELECT VALUE COUNT(c) FROM c WHERE c.CompId = @code and c.Discriminator = @disc and not IS_DEFINED(c.Answers[\"{CurrentQuestion}\"])")
+                .WithParameter("@code", m_Competition.Code)
+                .WithParameter("@disc", Participant.DiscriminatorValue)
+                .WithParameter("@quNo", CurrentQuestion);
+
+            var notAnsweredCount = await m_DataQuery.FetchSingle<Participant, int>(query, m_Competition.Code);
+            return notAnsweredCount == 0;
+        }
+
+        private async Task MoveToNextQuestion()
+        {
+            m_Competition.CurrentQuestion++;
+            m_Competition = await m_DataStore.Update(m_Competition, m_Competition.Code, m_Competition.Code);
+            await m_ParticipantNotifier.NotifyNextQuestion(m_Competition.Code, GetCurrentQuestion());
+        }
+
+        private async Task Finish()
+        {
+            // Should we clear up - do we need to keep this  instance in mem?
+            m_Competition.Finish();
+            m_Competition = await m_DataStore.Update(m_Competition, m_Competition.Code, m_Competition.Code);
+            await m_ParticipantNotifier.NotifyFinished(m_Competition.Code);
         }
     }
 

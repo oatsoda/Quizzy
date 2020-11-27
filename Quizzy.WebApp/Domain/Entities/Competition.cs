@@ -6,10 +6,12 @@ namespace Quizzy.WebApp.Data.Entities
 {
     public class Competition
     {
+        public const string DiscriminatorValue = "Competition";
+
         [JsonProperty("id")]
         public string Code { get; }
         public string CompId => Code;
-        public string Discriminator => "Competition";
+        public string Discriminator => DiscriminatorValue;
 
         public CompetitionStatus Status { get; private set; }
         public int CurrentQuestion { get; set; }
