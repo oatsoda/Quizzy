@@ -14,8 +14,6 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
   const [errorMessage, setError] = useState<string>();
   const [hubConnection, setHubConnection] = useState<HubConnection>();
   const [playState, setPlayState] = useState<PlayState>({ status: "connecting", answered: false });
-  //const [status, setStatus] = useState<"connecting" | "connected" | "joined" | "started">("connecting");
-  //const [questionTotals, setQuestionTotals] = useState<{ current: number, total: number }>();
 
   useEffect(() => {
     const newConnection = new HubConnectionBuilder()
