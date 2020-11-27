@@ -16,6 +16,7 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
   const [playState, setPlayState] = useState<PlayState>({ status: "connecting", answered: false });
 
   useEffect(() => {
+    // TODO: Avoid connecting if finished already? (visit to /quiz/{code} page)
     const newConnection = new HubConnectionBuilder()
       .withUrl("/signalr")
       .withAutomaticReconnect()
