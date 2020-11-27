@@ -17,6 +17,9 @@ namespace Quizzy.WebApp.Data.Entities
         public string Email { get; }
         public string Name { get; set; }
 
+        public bool IsConnected { get; private set; }
+        public string ClientId { get; private set; }
+
         public int TotalAnswers { get; private set; }
         public int CorrectAnswers { get; private set; }
 
@@ -32,11 +35,13 @@ namespace Quizzy.WebApp.Data.Entities
         }
 
         [JsonConstructor]
-        private Participant(Guid id, string compId, string email, Dictionary<int, ParticipantAnswer> answers)
+        private Participant(Guid id, string compId, string email, bool isConnected, string clientId, Dictionary<int, ParticipantAnswer> answers)
         {
             Id = id;
             CompId = compId;
             Email = email;
+            IsConnected = isConnected;
+            ClientId = clientId;
             Answers = answers;
         }
 
@@ -52,12 +57,13 @@ namespace Quizzy.WebApp.Data.Entities
             TotalAnswers = Answers.Count;
             CorrectAnswers = Answers.Values.Count(a => a.IsCorrect);
         }
-    }
 
-    public class ParticipantAnswer
-    {
-        public int Q { get; set; }
-        public int A { get; set; }
-        public bool IsCorrect { get; set; }
+        public void Connected(string clientId)
+        {
+            IsConnected = true;
+            ClientId = clientId;
+        }
+
+        public void Disconnected() => IsConnected = false;
     }
 }

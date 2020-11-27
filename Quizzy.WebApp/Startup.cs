@@ -87,7 +87,7 @@ namespace Quizzy.WebApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<QuizHub>("/signalr");
+                endpoints.MapHub<HubMessages>("/signalr");
             });
 
             app.MapWhen(

@@ -14,6 +14,7 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
   const [errorMessage, setError] = useState<string>();
   const [hubConnection, setHubConnection] = useState<HubConnection>();
   const [playState, setPlayState] = useState<PlayState>({ status: "connecting", answered: false });
+  const [participants, setParticipants] = useState<LiveParticipant[]>([]);
 
   useEffect(() => {
     // TODO: Avoid connecting if finished already? (visit to /quiz/{code} page)
@@ -39,8 +40,9 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
   useEffect(() => {
     if (hubConnection) {
 
-      hubConnection.on("joinConfirmed", (r: { participants: { id: string, name: string, connected: boolean }[], question?: Question }) => {   
+      hubConnection.on("joinConfirmed", (r: { participants: ParticipantList, question?: Question }) => {   
         setPlayState(prev => ({ ...prev, status: "joined", question: r.question }));
+        setParticipants(r.participants.participants);
       });
 
       hubConnection.on("joinFailed", (e: { errorMessage: string }) => {                  
@@ -48,9 +50,13 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
       });
       
       hubConnection.on("started", (q: Question) => {  
-        setPlayState({ status: "joined", question: q, answered: false });
+        setPlayState({ status: "started", question: q, answered: false });        
       });
       
+      hubConnection.on("participantsChanged", (p: ParticipantList) => {                  
+        setParticipants(p.participants);
+      });
+
       hubConnection.on("newQuestion", (q: Question) => {  
         // TODO: Replace fake delay with transition / something on the UI to make people realise there is a new question!
         (async () => { 
@@ -89,29 +95,51 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
     <div>
       <h3>{playState.status}</h3>
       <ErrorDisplay errorMessage={errorMessage} />
-      { playState.question && 
+      
       <Container>
-        <div>{playState.question.no} of {playState.question.total}</div>
-        <h4>{playState.question.q}</h4>
-        <Row className="mb-3">
-          <Col xl={6} >
-            <Card><CardBody>A <Button color="link" className="stretched-link" name="1" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a1}</Button></CardBody></Card>
+        <Row>
+          <Col xl={9}>
+          { playState.question && 
+            <>
+              <div>{playState.question.no} of {playState.question.total}</div>
+              <h4>{playState.question.q}</h4>
+              <Row className="mb-3">
+                <Col xl={6} >
+                  <Card><CardBody>A <Button color="link" className="stretched-link" name="1" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a1}</Button></CardBody></Card>
+                </Col>
+                <Col xl={6}>
+                  <Card><CardBody>B <Button color="link" className="stretched-link" name="2" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a2}</Button></CardBody></Card>
+                </Col>
+              </Row>
+              <Row className="mb-3">
+                <Col xl={6}>
+                  <Card><CardBody>C <Button color="link" className="stretched-link" name="3" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a3}</Button></CardBody></Card>
+                </Col>
+                <Col xl={6}>
+                  <Card><CardBody>D <Button color="link" className="stretched-link" name="4" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a4}</Button></CardBody></Card>
+                </Col>
+              </Row>
+            </>
+          }
           </Col>
-          <Col xl={6}>
-            <Card><CardBody>B <Button color="link" className="stretched-link" name="2" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a2}</Button></CardBody></Card>
-          </Col>
-        </Row>
-        <Row className="mb-3">
-          <Col xl={6}>
-            <Card><CardBody>C <Button color="link" className="stretched-link" name="3" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a3}</Button></CardBody></Card>
-          </Col>
-          <Col xl={6}>
-            <Card><CardBody>D <Button color="link" className="stretched-link" name="4" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a4}</Button></CardBody></Card>
+          <Col xl={3}>
+            <ParticipantView participants={participants} thisParticipantId={participant.id} />
           </Col>
         </Row>
       </Container>
-      }
     </div>
+  );
+}
+
+export function ParticipantView(props: { participants: LiveParticipant[], thisParticipantId: string }) {
+  const { participants, thisParticipantId } = props;
+
+  return (
+    <ul>
+      { participants.map((p) => 
+        <li key={p.id}>{p.id === thisParticipantId ? "YOU " : "" }{p.name} [{p.answeredCurrent ? "YES" : "NO" }] {p.isConnected ? "CONNECTED" : "DISCONNECTED" }</li>
+      )}
+    </ul>
   );
 }
 
@@ -129,4 +157,15 @@ type Question = {
   a4: string, 
   no: number, 
   total: number
+}
+
+type ParticipantList = {
+  participants: LiveParticipant[]
+}
+
+type LiveParticipant = {
+  id: string,
+  name: string,
+  answeredCurrent: string,
+  isConnected: boolean
 }

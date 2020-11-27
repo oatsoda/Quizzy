@@ -3,6 +3,11 @@ using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Fluent;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.IO;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Quizzy.WebApp.DomainInfrastructure
 {
@@ -15,7 +20,8 @@ namespace Quizzy.WebApp.DomainInfrastructure
         public static IServiceCollection AddCosmosDb(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
             var connString = configuration.GetConnectionString("CosmosQuizDb");
-            var cosmosClientBuilder = new CosmosClientBuilder(connString); // TODO: Upgrade to v4 once released and change to enums as strings.
+            var cosmosClientBuilder = new CosmosClientBuilder(connString) // TODO: Upgrade to v4 once released and change to enums as strings.
+                .AddCustomHandlers(new CosmosRequestHandler());
             serviceCollection.AddSingleton(cosmosClientBuilder.Build());
 
             return serviceCollection;
@@ -33,6 +39,27 @@ namespace Quizzy.WebApp.DomainInfrastructure
             database.Database.CreateContainerIfNotExistsAsync(new ContainerProperties(COMPS_CONTAINER_NAME, "/CompId"));
 
 
+        }
+    }
+
+    public class CosmosRequestHandler : RequestHandler
+    {
+        public override Task<ResponseMessage> SendAsync(RequestMessage request, CancellationToken cancellationToken) 
+        {
+#if DEBUG
+            if (request.Content != null)
+            {
+                using var ms = new MemoryStream();
+                request.Content.CopyTo(ms);
+                var q = Encoding.UTF8.GetString(ms.ToArray());
+                Console.WriteLine($"{request.Method} {request.RequestUri} : {q}");
+            }
+            else
+            {
+                Console.WriteLine($"{request.Method} {request.RequestUri} : null");
+            }
+#endif
+            return base.SendAsync(request, cancellationToken);
         }
     }
 }
