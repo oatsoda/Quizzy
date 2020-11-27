@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Quizzy.WebApp.Data.Entities
@@ -13,6 +14,9 @@ namespace Quizzy.WebApp.Data.Entities
 
         public string Email { get; }
         public string Name { get; set; }
+
+        public int TotalAnswers { get; private set; }
+        public int CorrectAnswers { get; private set; }
 
         public Dictionary<int, ParticipantAnswer> Answers { get; }
 
@@ -42,6 +46,9 @@ namespace Quizzy.WebApp.Data.Entities
                 A = answer,
                 IsCorrect = isCorrect
             };
+
+            TotalAnswers = Answers.Count;
+            CorrectAnswers = Answers.Values.Count(a => a.IsCorrect);
         }
     }
 

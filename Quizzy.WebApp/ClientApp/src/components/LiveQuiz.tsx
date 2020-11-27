@@ -3,9 +3,12 @@ import { HubConnectionBuilder, HubConnection, LogLevel } from '@microsoft/signal
 import { Competition, Participant } from '../api/Competition';
 import { ErrorDisplay } from './ErrorDisplay';
 import { Button, Card, CardBody, Col, Container, Row } from 'reactstrap';
+import { useHistory } from 'react-router-dom';
 
 export function LiveQuiz(props: { competition: Competition, participant: Participant }) {
 
+  const history = useHistory();
+  
   const { competition, participant } = props;
   
   const [errorMessage, setError] = useState<string>();
@@ -27,6 +30,14 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
   );
 
   useEffect(() => {
+
+    console.log(`STATUS CHECK ${playState.status} || ${competition.status}`);
+    if (playState.status === "finished" || competition.status === "finished") 
+      history.push(`/quiz/${competition.code}/results/${participant.id}`);
+
+  }, [competition.code, competition.status, history, participant.id, playState.status])
+
+  useEffect(() => {
     if (hubConnection) {
 
       hubConnection.on("joinConfirmed", (r: { participants: { id: string, name: string, connected: boolean }[], question?: Question }) => {   
@@ -42,7 +53,15 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
       });
       
       hubConnection.on("newQuestion", (q: Question) => {  
-        setPlayState(prev => ({ ...prev, question: q, answered: false }));
+        // TODO: Replace fake delay with transition / something on the UI to make people realise there is a new question!
+        (async () => { 
+          await delay(1000); 
+          setPlayState(prev => ({ ...prev, question: q, answered: false }));
+        })();
+      });
+
+      hubConnection.on("finished", () => {  
+        setPlayState(prev => ({ ...prev, status: "finished", question: undefined }));
       });
 
       hubConnection.start()
@@ -54,6 +73,10 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
     }
   }, [hubConnection, participant.id, competition.code]);
   
+  function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+  }
+
   const handleAnswer = useCallback(
     (e) => {        
       setPlayState(prev => ({ ...prev, answered: false }));
@@ -94,7 +117,7 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
 }
 
 type PlayState = {
-  status: "connecting" | "connected" | "joined" | "started",
+  status: "connecting" | "connected" | "joined" | "started" | "finished",
   question?: Question,
   answered: boolean
 }

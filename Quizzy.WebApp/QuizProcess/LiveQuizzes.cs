@@ -106,20 +106,35 @@ namespace Quizzy.WebApp.QuizProcess
             participant.Answer(questionNo, answerNo, m_Quiz.Questions[questionNo - 1].CorrectA == answerNo);
             await m_DataStore.Update(participant, participant.Id.ToString(), m_Competition.Code);
             
-            // TODO: Check if last question
+            // TODO: This is just moving on to next question (or finishing) from single person.  Need to add time/check all participants etc.
 
-            // TODO: This is just moving on to next question from single person.  Need to add time/check all participants etc.
-            // TODO: Add concurrency checks also?
-            m_Competition.CurrentQuestion++;
-            m_Competition = await m_DataStore.Update(m_Competition, m_Competition.Code, m_Competition.Code);
-
+            var finished = m_Competition.CurrentQuestion == m_Quiz.Questions.Count;
+            if (finished)
+            {
+                m_Competition.Finish();
+            }
+            else
+            {
+                m_Competition.CurrentQuestion++;
+            }
             
-            await m_ParticipantNotifier.NotifyNextQuestion(m_Competition.Code, GetCurrentQuestion());
+            // TODO: Add concurrency checks also?
+            m_Competition = await m_DataStore.Update(m_Competition, m_Competition.Code, m_Competition.Code);
+                        
+            if (finished)
+            {
+                await m_ParticipantNotifier.NotifyFinished(m_Competition.Code);
+            }
+            else
+            {
+                await m_ParticipantNotifier.NotifyNextQuestion(m_Competition.Code, GetCurrentQuestion());
+            }
+            
         }
 
         private Question GetCurrentQuestion()
         {
-            // TODO: Cache
+            // TODO: Cache map results
             var question = m_Mapper.Map<Question>(m_Quiz.Questions[CurrentQuestion - 1]);
             question.No = CurrentQuestion;
             question.Total = TotalQuestions;
@@ -128,6 +143,7 @@ namespace Quizzy.WebApp.QuizProcess
 
         private void LoadIfRecovering(string code)
         {
+            // Recovering means Server has restarted so Open/Started quiz has not yet been loaded
             if (m_IsRecovering)
             {
                 lock (m_Locker)
@@ -172,6 +188,11 @@ namespace Quizzy.WebApp.QuizProcess
         public Task NotifyNextQuestion(string code, Question question)
         {
             return m_HubContext.Clients.Group(code).NewQuestion(question);
+        }
+
+        public Task NotifyFinished(string code)
+        {
+            return m_HubContext.Clients.Group(code).Finished();
         }
     }
 }

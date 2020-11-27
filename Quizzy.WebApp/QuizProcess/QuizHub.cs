@@ -72,10 +72,12 @@ namespace Quizzy.WebApp.QuizProcess
     {
         Task JoinConfirmed(JoinConfirmed joinConfirmed);
         Task JoinFailed(Error participant);
+
         Task ParticipantListChanged(ParticipantList participants);
 
         Task Started(Question question);
         Task NewQuestion(Question question);
+        Task Finished();
     }
 
     public class LiveParticipant
