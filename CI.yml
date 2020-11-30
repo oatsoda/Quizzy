@@ -31,6 +31,11 @@ stages:
       inputs:
         versionSpec: '12.x'
     - task: Npm@1
+      displayName: 'Install ClientApp packages'
+      inputs:
+        command: 'install'
+        workingDir: $(clientAppPath)        
+    - task: Npm@1
       displayName: 'Build ClientApp'
       inputs:
         command: 'custom'
