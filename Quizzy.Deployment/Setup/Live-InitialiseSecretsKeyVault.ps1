@@ -1,0 +1,1 @@
+﻿.\InitialiseSecretsKeyVault.ps1 -SubscriptionId f2eec27e-505b-41ff-87a8-b38999936e14 -Internal $false -LiveServicePrincipalObjectId e46cad56-6a82-44d0-9d57-62556082b89d -ResourceGroupName "LiveQuizzyDeploymentResGrp" -ResourceGroupLocation "West US"

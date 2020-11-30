@@ -1,0 +1,115 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "hostingPlanName": {
+      "type": "string"
+    },
+    "webSiteName": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "The name for the WebApp."
+      }
+    },
+    "cosmosDbAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Cosmos DB Name to connect to."
+      }
+    },
+    "enableDetailedErrors": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "alwaysOn": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Azure WebSite Always On, no warmup required."
+      }
+    },
+    "slotsEnabled": {
+      "type": "bool",
+      "defaultValue": false
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "apiVersion": "2020-06-01",
+      "name": "[parameters('webSiteName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]": "Resource",
+        "displayName": "Website"
+      },
+      "dependsOn": [
+      ],
+      "properties": {
+        "name": "[parameters('webSiteName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
+        "clientAffinityEnabled": false,
+        "httpsOnly": true,
+        "siteConfig": {
+          "alwaysOn": "[parameters('alwaysOn')]",
+          "connectionStrings": [
+            {
+              "name": "CosmosQuizDb",
+              "connectionString": "[listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName')), '2019-12-12').connectionStrings[0].connectionString]",
+              "type": 3
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "appsettings",
+          "type": "config",
+          "apiVersion": "2020-06-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('webSiteName'))]"
+          ],
+          "tags": {
+            "displayName": "WebAppSettings"
+          },
+          "properties": {
+            "ASPNETCORE_DETAILEDERRORS": "[parameters('enableDetailedErrors')]"
+          }
+        },
+        {
+          "name": "web",
+          "type": "config",
+          "apiVersion": "2020-06-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('webSiteName'))]"
+          ],
+          "tags": {
+            "displayName": "Allowed IPs"
+          },
+          "properties": {
+            "ipSecurityRestrictions": []
+          }
+        },
+        {
+          "condition": "[parameters('slotsEnabled')]",
+          "type": "slots",
+          "apiVersion": "2020-06-01",
+          "name": "staging",
+          "tags": {
+            "displayName": "Staging Slot"
+          },
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('webSiteName'))]"
+          ],
+          "properties": {
+          },
+          "resources": []
+        }
+      ]
+    }
+  ]
+}
