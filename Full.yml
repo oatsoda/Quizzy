@@ -54,6 +54,9 @@ stages:
     # Track deployments on the environment.
   - deployment: DeployInfrastructure
     displayName: Deploy Infrastructure
+        
+    condition: and(succeeded(), eq(variables['skipInfrastructure'], 'false'))
+
     # Creates an environment if it doesn't exist.
     environment: 'Live'
     strategy:
@@ -146,4 +149,4 @@ stages:
               azureSubscription: 'LiveQuizzy'
               appType: 'webApp'
               WebAppName: 'Live-QuizzyWebApp'
-              packageForLinux: '$(System.ArtifactsDirectory)\WebApp'
+              packageForLinux: '$(System.ArtifactsDirectory)\WebApp\*.zip'
