@@ -83,7 +83,7 @@ stages:
               location: 'UK South'
               templateLocation: 'Linked artifact'
               csmFile: '$(System.ArtifactsDirectory)\Deployment\Templates\CosmosDb.Template.json'
-              csmParametersFile: '$(System.ArtifactsDirectory)\Quizzy.CosmosDb.Live.json'
+              csmParametersFile: '$(System.ArtifactsDirectory)\Deployment\Quizzy.CosmosDb.Live.json'
               deploymentMode: 'Incremental'
 
           - task: AzureResourceManagerTemplateDeployment@3
@@ -97,7 +97,7 @@ stages:
               location: 'UK South'
               templateLocation: 'Linked artifact'
               csmFile: '$(System.ArtifactsDirectory)\Deployment\Templates\HostingPlan.Template.json'
-              csmParametersFile: '$(System.ArtifactsDirectory)\Quizzy.HostingPlan.Live.json'
+              csmParametersFile: '$(System.ArtifactsDirectory)\Deployment\Quizzy.HostingPlan.Live.json'
               deploymentMode: 'Incremental'
 
           - task: AzureResourceManagerTemplateDeployment@3
@@ -111,7 +111,7 @@ stages:
               location: 'UK South'
               templateLocation: 'Linked artifact'
               csmFile: '$(System.ArtifactsDirectory)\Deployment\Templates\AppService.Template.json'
-              csmParametersFile: '$(System.ArtifactsDirectory)\Quizzy.WebApp.AppService.Live.json'
+              csmParametersFile: '$(System.ArtifactsDirectory)\Deployment\Quizzy.WebApp.AppService.Live.json'
               deploymentMode: 'Incremental'
 
 - stage: DeployWeb
