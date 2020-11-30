@@ -12,8 +12,9 @@
   "variables": {
     "databaseName": "quizzes",
     "quizContainerName": "quizzes",
-    "quizContainerPartKey": "/partKey",
-    "competitionContainerName": "competitions"
+    "quizContainerPartKey": "/PartKey",
+    "competitionContainerName": "competitions",
+    "competitionContainerPartKey": "/CompId"
   },
   "resources": [
     {
@@ -72,6 +73,34 @@
           "partitionKey": {
             "paths": [
               "[variables('quizContainerPartKey')]"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          },
+          "defaultTtl": 86400
+        }
+      }
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "name": "[concat(parameters('cosmosAccountName'), '/', variables('databaseName'), '/', variables('competitionContainerName'))]",
+      "apiVersion": "2020-04-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosAccountName'), variables('databaseName'))]"
+      ],
+      "properties": {
+        "resource": {
+          "id": "[variables('competitionContainerName')]",
+          "partitionKey": {
+            "paths": [
+              "[variables('competitionContainerPartKey')]"
             ],
             "kind": "Hash"
           },
