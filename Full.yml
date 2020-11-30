@@ -55,7 +55,7 @@ stages:
   - deployment: DeployInfrastructure
     displayName: Deploy Infrastructure
         
-    condition: and(succeeded(), eq(variables['skipInfrastructure'], 'false'))
+    condition: and(succeeded(), ne(variables['skipInfrastructure'], 'true'))
 
     # Creates an environment if it doesn't exist.
     environment: 'Live'
