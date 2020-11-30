@@ -23,11 +23,12 @@ stages:
       displayName: 'Ensure Node Installed'
       inputs:
         versionSpec: '12.x'
-    - task: Npm@1
-      displayName: 'Install ClientApp packages'
-      inputs:
-        command: 'install'
-        workingDir: $(clientAppPath)   
+# think it does this in the publish anyway
+#    - task: Npm@1
+#      displayName: 'Install ClientApp packages'
+#      inputs:
+#        command: 'install'
+#        workingDir: $(clientAppPath)   
     - task: DotNetCoreCLI@2
       displayName: 'Publish WebApp'
       inputs:
@@ -47,8 +48,8 @@ stages:
         ArtifactName: 'Deployment'
         publishLocation: 'Container'
 
-- stage: Deploy
-  displayName: Deploy
+- stage: DeployInfrastructure
+  displayName: Deploy Infrastructure
   jobs:
     # Track deployments on the environment.
   - deployment: DeployInfrastructure
@@ -60,7 +61,8 @@ stages:
       runOnce:
         deploy:
           steps:
-          - checkout: none 
+          - checkout: none
+          - download: none
 
           - task: DownloadBuildArtifacts@0
             displayName: 'Download Deployment'
@@ -112,9 +114,13 @@ stages:
               csmParametersFile: '$(System.ArtifactsDirectory)\Quizzy.WebApp.AppService.Live.json'
               deploymentMode: 'Incremental'
 
+- stage: DeployWeb
+  displayName: Deploy Web App
+  jobs:
+
     # Track deployments on the environment.
   - deployment: DeployWeb
-    displayName: deploy Web App
+    displayName: Deploy Web App
     # Creates an environment if it doesn't exist.
     environment: 'Live'
     strategy:
@@ -123,6 +129,7 @@ stages:
         deploy:
           steps:
           - checkout: none 
+          - download: none
 
           - task: DownloadBuildArtifacts@0
             displayName: 'Download WebApp'
