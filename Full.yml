@@ -1,0 +1,142 @@
+name: 1.0$(rev:.r)
+
+trigger: none
+
+# no PR triggers
+pr: none
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildConfiguration: 'Release'
+  clientAppPath: 'Quizzy.WebApp\ClientApp'
+
+stages:
+- stage: Build
+  displayName: Build
+  jobs:
+  - job: Server
+    steps:
+    - task: NodeTool@0
+      displayName: 'Ensure Node Installed'
+      inputs:
+        versionSpec: '12.x'
+    - task: Npm@1
+      displayName: 'Install ClientApp packages'
+      inputs:
+        command: 'install'
+        workingDir: $(clientAppPath)   
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish WebApp'
+      inputs:
+        command: 'publish'
+        projects: '$(solution)'
+        arguments: '-c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Upload WebApp Artifact'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'WebApp'
+        publishLocation: 'Container'    
+    - task: PublishBuildArtifacts@1
+      displayName: 'Upload Deployment'
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/Quizzy.Deployment'
+        ArtifactName: 'Deployment'
+        publishLocation: 'Container'
+
+- stage: Deploy
+  displayName: Deploy
+  jobs:
+    # Track deployments on the environment.
+  - deployment: DeployInfrastructure
+    displayName: Deploy Infrastructure
+    # Creates an environment if it doesn't exist.
+    environment: 'Live'
+    strategy:
+      # Default deployment strategy, more coming...
+      runOnce:
+        deploy:
+          steps:
+          - checkout: none 
+
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Deployment'
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'Deployment'
+              downloadPath: '$(System.ArtifactsDirectory)'
+              
+          - task: AzureResourceManagerTemplateDeployment@3
+            displayName: 'Deploy CosmosDB'
+            inputs:
+              deploymentScope: 'Resource Group'
+              azureResourceManagerConnection: 'LiveQuizzy'
+              subscriptionId: 'f2eec27e-505b-41ff-87a8-b38999936e14'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: 'LiveQuizzyResGrp'
+              location: 'UK South'
+              templateLocation: 'Linked artifact'
+              csmFile: '$(System.ArtifactsDirectory)\Templates\CosmosDb.Template.json'
+              csmParametersFile: '$(System.ArtifactsDirectory)\Quizzy.CosmosDb.Live.json'
+              deploymentMode: 'Incremental'
+
+          - task: AzureResourceManagerTemplateDeployment@3
+            displayName: 'Deploy Hosting Plan'
+            inputs:
+              deploymentScope: 'Resource Group'
+              azureResourceManagerConnection: 'LiveQuizzy'
+              subscriptionId: 'f2eec27e-505b-41ff-87a8-b38999936e14'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: 'LiveQuizzyResGrp'
+              location: 'UK South'
+              templateLocation: 'Linked artifact'
+              csmFile: '$(System.ArtifactsDirectory)\Templates\HostingPlan.Template.json'
+              csmParametersFile: '$(System.ArtifactsDirectory)\Quizzy.HostingPlan.Live.json'
+              deploymentMode: 'Incremental'
+
+          - task: AzureResourceManagerTemplateDeployment@3
+            displayName: 'Deploy WebApp'
+            inputs:
+              deploymentScope: 'Resource Group'
+              azureResourceManagerConnection: 'LiveQuizzy'
+              subscriptionId: 'f2eec27e-505b-41ff-87a8-b38999936e14'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: 'LiveQuizzyResGrp'
+              location: 'UK South'
+              templateLocation: 'Linked artifact'
+              csmFile: '$(System.ArtifactsDirectory)\Templates\AppService.Template.json'
+              csmParametersFile: '$(System.ArtifactsDirectory)\Quizzy.WebApp.AppService.Live.json'
+              deploymentMode: 'Incremental'
+
+    # Track deployments on the environment.
+  - deployment: DeployWeb
+    displayName: deploy Web App
+    # Creates an environment if it doesn't exist.
+    environment: 'Live'
+    strategy:
+      # Default deployment strategy, more coming...
+      runOnce:
+        deploy:
+          steps:
+          - checkout: none 
+
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download WebApp'
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'WebApp'
+              downloadPath: '$(System.ArtifactsDirectory)'
+              
+          - task: AzureRmWebAppDeployment@4
+            displayName: 'Deploy WebApp'
+            inputs:
+              ConnectionType: 'AzureRM'
+              azureSubscription: 'LiveQuizzy'
+              appType: 'webApp'
+              WebAppName: 'Live-QuizzyWebApp'
+              packageForLinux: '$(System.ArtifactsDirectory)'
