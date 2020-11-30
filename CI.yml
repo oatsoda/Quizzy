@@ -1,0 +1,26 @@
+name: CI_$(date:yyyyMMdd)$(rev:.r)
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildConfiguration: 'Release'
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: 'Build All'
+  inputs:
+    command: 'build'
+    projects: '$(solution)'
+    arguments: '-c $(buildConfiguration)'
+
+#- task: DotNetCoreCLI@2
+#  displayName: 'Unit Tests'
+#  inputs:
+#    command: 'test'
+#    projects: '**/*[Tt]ests/*.csproj'
+#    arguments: '-c $(buildConfiguration) --no-build'
