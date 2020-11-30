@@ -9,14 +9,33 @@ pool:
 variables:
   solution: '**/*.sln'
   buildConfiguration: 'Release'
+  clientAppPath: 'Quizzy.WebApp\ClientApp'
 
-steps:
-- task: DotNetCoreCLI@2
-  displayName: 'Build All'
-  inputs:
-    command: 'build'
-    projects: '$(solution)'
-    arguments: '-c $(buildConfiguration)'
+stages:
+- stage: Build
+  displayName: Build
+  jobs:
+  - job: Server
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: 'Build All'
+      inputs:
+        command: 'build'
+        projects: '$(solution)'
+        arguments: '-c $(buildConfiguration)'
+
+  - job: ClientApp
+    steps:
+    - task: NodeTool@0
+      displayName: 'Ensure Node Installed'
+      inputs:
+      versionSpec: '12.x'
+    - task: Npm@1
+      displayName: 'Build ClientApp'
+      inputs:
+        command: 'custom'
+        workingDir: $(clientAppPath)
+        customCommand: 'run build'
 
 #- task: DotNetCoreCLI@2
 #  displayName: 'Unit Tests'
