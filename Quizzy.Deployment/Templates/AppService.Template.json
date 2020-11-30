@@ -24,7 +24,7 @@
     },
     "alwaysOn": {
       "type": "bool",
-      "defaultValue": true,
+      "defaultValue": false,
       "metadata": {
         "description": "Azure WebSite Always On, no warmup required."
       }
