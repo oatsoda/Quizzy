@@ -29,7 +29,7 @@ stages:
     - task: NodeTool@0
       displayName: 'Ensure Node Installed'
       inputs:
-      versionSpec: '12.x'
+        versionSpec: '12.x'
     - task: Npm@1
       displayName: 'Build ClientApp'
       inputs:
