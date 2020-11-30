@@ -82,7 +82,7 @@ stages:
               resourceGroupName: 'LiveQuizzyResGrp'
               location: 'UK South'
               templateLocation: 'Linked artifact'
-              csmFile: '$(System.ArtifactsDirectory)\Templates\CosmosDb.Template.json'
+              csmFile: '$(System.ArtifactsDirectory)\Deployment\Templates\CosmosDb.Template.json'
               csmParametersFile: '$(System.ArtifactsDirectory)\Quizzy.CosmosDb.Live.json'
               deploymentMode: 'Incremental'
 
@@ -96,7 +96,7 @@ stages:
               resourceGroupName: 'LiveQuizzyResGrp'
               location: 'UK South'
               templateLocation: 'Linked artifact'
-              csmFile: '$(System.ArtifactsDirectory)\Templates\HostingPlan.Template.json'
+              csmFile: '$(System.ArtifactsDirectory)\Deployment\Templates\HostingPlan.Template.json'
               csmParametersFile: '$(System.ArtifactsDirectory)\Quizzy.HostingPlan.Live.json'
               deploymentMode: 'Incremental'
 
@@ -110,7 +110,7 @@ stages:
               resourceGroupName: 'LiveQuizzyResGrp'
               location: 'UK South'
               templateLocation: 'Linked artifact'
-              csmFile: '$(System.ArtifactsDirectory)\Templates\AppService.Template.json'
+              csmFile: '$(System.ArtifactsDirectory)\Deployment\Templates\AppService.Template.json'
               csmParametersFile: '$(System.ArtifactsDirectory)\Quizzy.WebApp.AppService.Live.json'
               deploymentMode: 'Incremental'
 
@@ -146,4 +146,4 @@ stages:
               azureSubscription: 'LiveQuizzy'
               appType: 'webApp'
               WebAppName: 'Live-QuizzyWebApp'
-              packageForLinux: '$(System.ArtifactsDirectory)'
+              packageForLinux: '$(System.ArtifactsDirectory)\WebApp'
