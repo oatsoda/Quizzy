@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { HubConnectionBuilder, HubConnection, LogLevel } from '@microsoft/signalr';
-import { Competition, Participant } from '../../../api/competitionTypes';
+import { Competition } from '../../../api/competitionTypes';
+import { Participant } from "../../../api/participantTypes";
 import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Button, Card, CardBody, Col, Container, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';

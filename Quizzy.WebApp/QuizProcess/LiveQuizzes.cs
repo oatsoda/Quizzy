@@ -45,5 +45,7 @@ namespace Quizzy.WebApp.QuizProcess
             var liveQuiz = m_LiveQuizzes.GetOrAdd(answer.CompetitionCode, _ => m_LiveQuizFactory());
             return liveQuiz.AnswerQuestion(answer.ParticipantId, answer.QuestionNo, answer.AnswerNo);
         }
+
+        // TODO: Periodically remove finished quizzes
     }
 }

@@ -15,22 +15,4 @@ export type CompetitionQuiz = {
   creatorEmail: string
 }
 
-export type Participant = {
-  id: string,
-  name: string,
-  email: string
-}
-
-export type ParticipantNew = {
-  name: string,
-  email: string
-}
-
-export function createParticipantNew() : ParticipantNew {
-  return {
-    name: "",
-    email: ""    
-  }
-}
-
 export type CompetitionStatus = "new" | "open" | "started" | "finished";

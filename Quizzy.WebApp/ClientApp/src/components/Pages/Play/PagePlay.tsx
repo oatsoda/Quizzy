@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import quizzesApi from '../../../api/quizzesApi';
-import { Competition, Participant } from "../../../api/competitionTypes";
+import { Competition } from "../../../api/competitionTypes";
+import { Participant } from "../../../api/participantTypes";
 import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Loader } from '../../General/Loader';
 import { CreateParticipant } from './CreateParticipant'

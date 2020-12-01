@@ -1,5 +1,6 @@
 import Axios from 'axios'
-import { Competition, CompetitionOnly, Participant, ParticipantNew } from './competitionTypes';
+import { Competition, CompetitionOnly } from './competitionTypes';
+import { ParticipantNew, Participant, ParticipantResult } from './participantTypes';
 import { processResponseAxios, flattenApiError } from './apiHelpers';
 import { Quiz, QuizNew } from './quizTypes';
 
@@ -34,6 +35,23 @@ export class QuizzesApi {
     const url = `${apiBaseUrl}competitions/${code}/participants/`;
 
     return await Axios.put<Participant>(url, participant, { validateStatus: _ => true })
+                      .then(processResponseAxios)
+                      .then(response => {
+                        // repsonses with status < 400 get resolved
+                        return response.data;
+                      }) 
+                      .catch(error => {                        
+                        const errMsg = flattenApiError(error);
+                        onError(`Oops, something went wrong [${error.status} - ${errMsg}]`);                        
+                        return undefined;
+                      });
+  }
+
+  async getParticipantResults(code: string, participantId: string, onError: (error: string) => void) : Promise<ParticipantResult | undefined> {
+
+    const url = `${apiBaseUrl}competitions/${code}/participants/${participantId}/results/`;
+
+    return await Axios.get<ParticipantResult>(url, { validateStatus: _ => true })
                       .then(processResponseAxios)
                       .then(response => {
                         // repsonses with status < 400 get resolved
