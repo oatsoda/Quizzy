@@ -2,7 +2,7 @@ import Axios from 'axios'
 import { Competition, Participant, ParticipantNew } from './Competition';
 import { processResponseAxios, flattenApiError } from './ApiHelpers';
 
-const apiBaseUrl = "https://localhost:5001/api/";
+const apiBaseUrl = "api/";
 
 export class QuizzesApi {
 
