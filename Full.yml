@@ -2,7 +2,14 @@ name: 1.0$(rev:.r)
 
 # change back to "trigger: none" when not doing Cont Deploy
 trigger: 
-- main
+  branches: 
+    include:
+    - main
+  paths:
+    exclude:
+    - .gitignore
+    - CI.yaml
+    - README.md
 
 # no PR triggers
 pr: none
