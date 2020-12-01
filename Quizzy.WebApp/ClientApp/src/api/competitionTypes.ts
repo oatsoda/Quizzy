@@ -1,8 +1,10 @@
-
-export type Competition = {
+export type CompetitionOnly = { // TODO: rename
   code: string;
-  status: "new" | "open" | "started" | "finished"
+  status: CompetitionStatus;
   quizId: string;
+};
+
+export type Competition = CompetitionOnly & {
   quiz: CompetitionQuiz;
 };
 
@@ -30,3 +32,5 @@ export function createParticipantNew() : ParticipantNew {
     email: ""    
   }
 }
+
+export type CompetitionStatus = "new" | "open" | "started" | "finished";

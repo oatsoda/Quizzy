@@ -1,6 +1,7 @@
 name: 1.0$(rev:.r)
 
-trigger: none
+# change back to none when not doing Cont Deploy
+trigger: main 
 
 # no PR triggers
 pr: none
@@ -23,12 +24,6 @@ stages:
       displayName: 'Ensure Node Installed'
       inputs:
         versionSpec: '12.x'
-# think it does this in the publish anyway
-#    - task: Npm@1
-#      displayName: 'Install ClientApp packages'
-#      inputs:
-#        command: 'install'
-#        workingDir: $(clientAppPath)   
     - task: DotNetCoreCLI@2
       displayName: 'Publish WebApp'
       inputs:
