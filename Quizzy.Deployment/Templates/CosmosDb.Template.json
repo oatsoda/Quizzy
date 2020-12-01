@@ -10,10 +10,10 @@
     }
   },
   "variables": {
-    "databaseName": "quizzes",
-    "quizContainerName": "quizzes",
+    "databaseName": "Quizzes",
+    "quizContainerName": "Quizzes",
     "quizContainerPartKey": "/PartKey",
-    "competitionContainerName": "competitions",
+    "competitionContainerName": "Competitions",
     "competitionContainerPartKey": "/CompId"
   },
   "resources": [
