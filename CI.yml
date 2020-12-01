@@ -1,7 +1,15 @@
 name: CI_$(date:yyyyMMdd)$(rev:.r)
 
 trigger:
-- main
+  branches: 
+    include:
+    - main
+  paths:
+    exclude:
+    - Quizzy.Deployment/*
+    - .gitignore
+    - Full.yaml
+    - README.md
 
 pool:
   vmImage: 'windows-latest'
