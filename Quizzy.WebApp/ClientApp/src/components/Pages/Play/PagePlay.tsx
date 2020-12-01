@@ -7,6 +7,7 @@ import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Loader } from '../../General/Loader';
 import { CreateParticipant } from './CreateParticipant'
 import { LiveQuiz } from './LiveQuiz'
+import { MenuBar } from '../../Nav/MenuBar';
 
 export function PagePlay() {
 
@@ -40,17 +41,20 @@ export function PagePlay() {
   const handleParticipantCreated = useCallback((p : Participant) => setParticipant(p), []);
 
   return (
-    <Container fluid={true}>
-      <Loader isLoading={isLoading} />
-      <ErrorDisplay errorMessage={errorMessage} />
-      { competition && !participant &&
-        <CreateParticipant competition={competition} onParticipantCreated={handleParticipantCreated} onCancel={handleCancelCreateParticipant}  />
-      }
-      <h1>Quiz {competition?.quiz.name}</h1>
-      <h2>You: {participant?.name} {participant?.email}</h2>
-      { competition && participant &&
-        <LiveQuiz competition={competition} participant={participant} />
-      }
-    </Container>
+    <>
+      <MenuBar />
+      <Container fluid={true}>
+        <Loader isLoading={isLoading} />
+        <ErrorDisplay errorMessage={errorMessage} />
+        { competition && !participant &&
+          <CreateParticipant competition={competition} onParticipantCreated={handleParticipantCreated} onCancel={handleCancelCreateParticipant}  />
+        }
+        <h1>Quiz {competition?.quiz.name}</h1>
+        <h2>You: {participant?.name} {participant?.email}</h2>
+        { competition && participant &&
+          <LiveQuiz competition={competition} participant={participant} />
+        }
+      </Container>
+    </>
   );
 }
