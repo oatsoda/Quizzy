@@ -1,7 +1,8 @@
 name: 1.0$(rev:.r)
 
-# change back to none when not doing Cont Deploy
-trigger: main 
+# change back to "trigger: none" when not doing Cont Deploy
+trigger: 
+- main
 
 # no PR triggers
 pr: none
