@@ -32,9 +32,14 @@
     "slotsEnabled": {
       "type": "bool",
       "defaultValue": false
+    },
+    "insightsEnabled": {
+      "type": "bool",
+      "defaultValue": false
     }
   },
   "variables": {
+    "insightsName": "[concat(parameters('webSiteName'), 'Insights')]"
   },
   "resources": [
     {
@@ -76,7 +81,8 @@
             "displayName": "WebAppSettings"
           },
           "properties": {
-            "ASPNETCORE_DETAILEDERRORS": "[parameters('enableDetailedErrors')]"
+            "ASPNETCORE_DETAILEDERRORS": "[parameters('enableDetailedErrors')]",
+            "ApplicationInsights:InstrumentationKey": "[if(equals(parameters('insightsEnabled'), true()), reference(resourceId('Microsoft.Insights/components', variables('insightsName')), '2014-04-01').InstrumentationKey, json('null'))]"
           }
         },
         {

@@ -104,6 +104,20 @@ stages:
               deploymentMode: 'Incremental'
 
           - task: AzureResourceManagerTemplateDeployment@3
+            displayName: 'Deploy WebApp Insights'
+            inputs:
+              deploymentScope: 'Resource Group'
+              azureResourceManagerConnection: 'LiveQuizzy'
+              subscriptionId: 'f2eec27e-505b-41ff-87a8-b38999936e14'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: 'LiveQuizzyResGrp'
+              location: 'UK South'
+              templateLocation: 'Linked artifact'
+              csmFile: '$(System.ArtifactsDirectory)\Deployment\Templates\AppInsights.Template.json'
+              csmParametersFile: '$(System.ArtifactsDirectory)\Deployment\Quizzy.WebApp.AppInsights.Live.json'
+              deploymentMode: 'Incremental'
+
+          - task: AzureResourceManagerTemplateDeployment@3
             displayName: 'Deploy WebApp'
             inputs:
               deploymentScope: 'Resource Group'

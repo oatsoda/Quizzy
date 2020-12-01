@@ -1,0 +1,50 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "webSiteName": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "The name of the WebApp this Insights will be used for."
+      }
+    },
+    "appType": {
+      "type": "string",
+      "defaultValue": "web",
+      "allowedValues": [
+        "web",
+        "ios",
+        "store",
+        "java", 
+        "phone",
+        "other"
+      ],
+      "metadata": {
+        "description": "The Type of Application this Insights will be used for."
+      }
+    }
+  },
+  "variables": {
+    "insightsName": "[concat(parameters('webSiteName'), 'Insights')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-05-01",
+      "type": "Microsoft.Insights/components",
+      "name": "[variables('insightsName')]",
+      "location": "[resourceGroup().location]",
+      "kind": "[parameters('appType')]",
+      "tags": {
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('webSiteName'))]": "Resource"
+      },
+      "properties": {
+        "Application_Type": "[parameters('appType')]",
+        "RetentionInDays": 30,
+        "ImmediatePurgeDataOn30Days": true
+      }
+    }
+  ],
+  "outputs": {
+  }
+}
