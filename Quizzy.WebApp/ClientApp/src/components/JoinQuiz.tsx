@@ -9,28 +9,27 @@ export function JoinQuiz() {
   const history = useHistory();
 
   const [code, setCode] = useState<string>("");
-  const [buttonEnabled, setButtonEnabled] = useState(false);
-  const [errorMsg, setErrorMessage] = useState<string>();
+  const [state, setState] = useState<JoinQuizState>({ buttonEnabled: false, loading: false });
 
   const handleCodeChange = useCallback((e) => { 
       setCode(e.target.value); 
       if (e.target.value && e.target.value.toString().length === 8)
-        setButtonEnabled(true);
+        setState({ buttonEnabled: true, loading: false });
       else
-        setButtonEnabled(false);
+        setState({ buttonEnabled: false, loading: false });
     }, 
     []);
 
-  const useCode = useCallback(async () => { 
-    // TODO: Loading state
+  const handleButtonClick = useCallback(async () => {      
+      setState({ buttonEnabled: false, loading: true });
       let competition = await quizzesApi.getCompetition(code, e => {
-        setErrorMessage(e);
+        setState({ buttonEnabled: true, loading: false, errorMessage: e });
       });
 
       if (competition?.status === "new")
-        setErrorMessage("This quiz has not yet started.  Try again once the organiser has started it.");
+        setState({ buttonEnabled: true, loading: false, errorMessage: "This quiz has not yet started.  Try again once the organiser has started it." });
       else if (competition?.status === "finished")
-        setErrorMessage("This quiz has finished.");
+        setState({ buttonEnabled: true, loading: false, errorMessage: "This quiz has finished." });
       else if (competition) 
         history.push(`/quiz/${code}`);
     }, 
@@ -38,14 +37,22 @@ export function JoinQuiz() {
 
   return (
     <Form className="w-100 p-3 border border-secondary rounded">
-      { errorMsg && <Alert color="danger">{errorMsg}</Alert>}
+      { state.errorMessage && <Alert color="danger">{state.errorMessage}</Alert>}
       <FormGroup>
         <Label for="join-code">Code</Label>
         <Input type="text" name="code" id="join-code" maxLength={8} value={code} placeholder="Enter 8 digit code" onChange={handleCodeChange} />
       </FormGroup>
-      <FormGroup className="text-center">
-        <Button disabled={!buttonEnabled} onClick={useCode} color="warning">Join a Quiz</Button>
+      <FormGroup className="text-center mb-0">
+        <Button disabled={!state.buttonEnabled} onClick={handleButtonClick} color="warning">
+          { state.loading && <span className="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span> }
+          Join a Quiz
+        </Button>
       </FormGroup>
     </Form>
   );
+}
+type JoinQuizState = {
+  buttonEnabled: boolean, 
+  loading: boolean, 
+  errorMessage?: string
 }
