@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import quizzesApi from '../../../api/quizzesApi';
-import { Competition, Participant } from "../../../api/Competition";
+import { Competition, Participant } from "../../../api/competitionTypes";
 import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Loader } from '../../General/Loader';
 import { CreateParticipant } from './CreateParticipant'

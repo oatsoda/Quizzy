@@ -1,6 +1,7 @@
 import Axios from 'axios'
-import { Competition, Participant, ParticipantNew } from './Competition';
-import { processResponseAxios, flattenApiError } from './ApiHelpers';
+import { Competition, Participant, ParticipantNew } from './competitionTypes';
+import { processResponseAxios, flattenApiError } from './apiHelpers';
+import { Quiz, QuizNew } from './quizTypes';
 
 const apiBaseUrl = "api/";
 
@@ -44,6 +45,25 @@ export class QuizzesApi {
                         return undefined;
                       });
   }
+
+
+  async postQuiz(participant: QuizNew, onError: (error: string) => void) : Promise<Quiz | undefined> {
+
+    const url = `${apiBaseUrl}quizzes/`;
+
+    return await Axios.post<Quiz>(url, participant, { validateStatus: _ => true })
+                      .then(processResponseAxios)
+                      .then(response => {
+                        // repsonses with status < 400 get resolved
+                        return response.data;
+                      }) 
+                      .catch(error => {                        
+                        const errMsg = flattenApiError(error);
+                        onError(`Oops, something went wrong [${error.status} - ${errMsg}]`);                        
+                        return undefined;
+                      });
+  }
+
 }
 
 const quizzesApi = new QuizzesApi();

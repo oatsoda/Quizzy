@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Label, Input } from 'reactstrap';
 import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Loader } from '../../General/Loader';
-import { Competition, Participant, ParticipantNew, createParticipantNew } from '../../../api/Competition'
+import { Competition, Participant, ParticipantNew, createParticipantNew } from '../../../api/competitionTypes'
 import quizzesApi from '../../../api/quizzesApi';
 
 const addPersonModalId: string = "personAddModal";
@@ -63,7 +63,7 @@ function CreateParticipant(props: {
             <Input type="text" name="name" placeholder="Enter name" onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
-            <Label for="name">Name</Label>
+            <Label for="name">Email</Label>
             <Input type="email" name="email" placeholder="Enter email" onChange={handleInputChange} />
           </FormGroup>            
         </Form>
