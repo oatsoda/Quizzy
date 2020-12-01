@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useHistory } from 'react-router-dom'
 import { Button, FormGroup, Form, Label, Input, Alert } from 'reactstrap';
 
-import quizzesApi from '../api/quizzesApi';
+import quizzesApi from '../../../api/quizzesApi';
 
 export function JoinQuiz() {
 

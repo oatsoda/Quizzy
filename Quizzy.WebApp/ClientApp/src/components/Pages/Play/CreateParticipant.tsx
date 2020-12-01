@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Label, Input } from 'reactstrap';
-import { ErrorDisplay } from './ErrorDisplay';
-import { Loader } from './Loader';
-import { Competition, Participant, ParticipantNew, createParticipantNew } from '../api/Competition'
-import quizzesApi from '../api/quizzesApi';
+import { ErrorDisplay } from '../../General/ErrorDisplay';
+import { Loader } from '../../General/Loader';
+import { Competition, Participant, ParticipantNew, createParticipantNew } from '../../../api/Competition'
+import quizzesApi from '../../../api/quizzesApi';
 
 const addPersonModalId: string = "personAddModal";
 

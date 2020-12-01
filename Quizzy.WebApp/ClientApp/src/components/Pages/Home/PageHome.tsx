@@ -4,7 +4,7 @@ import { CreateQuizLink } from './CreateQuizLink';
 import { HomeBanner } from './HomeBanner';
 import { JoinQuiz } from './JoinQuiz';
 
-export function Home() {
+export function PageHome() {
   return (
     <>
     <HomeBanner />

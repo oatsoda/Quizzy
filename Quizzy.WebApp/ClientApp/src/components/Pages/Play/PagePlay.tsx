@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { Container } from 'reactstrap';
-import quizzesApi from '../api/quizzesApi';
-import { Competition, Participant } from "../api/Competition";
-import { ErrorDisplay } from './ErrorDisplay';
-import { Loader } from './Loader';
+import quizzesApi from '../../../api/quizzesApi';
+import { Competition, Participant } from "../../../api/Competition";
+import { ErrorDisplay } from '../../General/ErrorDisplay';
+import { Loader } from '../../General/Loader';
 import { CreateParticipant } from './CreateParticipant'
 import { LiveQuiz } from './LiveQuiz'
 
-export function PlayQuiz() {
+export function PagePlay() {
 
   const history = useHistory();
 
