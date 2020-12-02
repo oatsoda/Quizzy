@@ -3,8 +3,10 @@ import { HubConnectionBuilder, HubConnection, LogLevel } from '@microsoft/signal
 import { Competition } from '../../../api/competitionTypes';
 import { Participant } from "../../../api/participantTypes";
 import { ErrorDisplay } from '../../General/ErrorDisplay';
-import { Button, Card, CardBody, Col, Container, Row } from 'reactstrap';
+import { Alert, Button, Card, CardBody, Col, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
+import { ParticipantView } from './ParticipantView';
+import { PlayState, Question, ParticipantList, LiveParticipant } from './playTypes';
 
 export function LiveQuiz(props: { competition: Competition, participant: Participant }) {
 
@@ -84,89 +86,59 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
   }
 
   const handleAnswer = useCallback(
-    (e) => {        
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {        
       setPlayState(prev => ({ ...prev, answered: false }));
-      console.log("ANSWER: " + participant.id + " / " + competition.code + " @ " + playState.question?.no + " - " + e.target.name);
-      hubConnection!.invoke("answerQuestion", { participantId: participant.id, competitionCode: competition.code, questionNo: playState.question!.no, answerNo: Number(e.target.name) });
+      const name = e.currentTarget.name;
+      console.log("ANSWER: " + participant.id + " / " + competition.code + " @ " + playState.question?.no + " - " + name);
+      hubConnection!.invoke("answerQuestion", { participantId: participant.id, competitionCode: competition.code, questionNo: playState.question!.no, answerNo: Number(name) });
     },
     [competition.code, hubConnection, participant.id, playState.question]
   );
 
   return (
     <div>
-      <h3>{playState.status}</h3>
       <ErrorDisplay errorMessage={errorMessage} />
       
-      <Container>
-        <Row>
-          <Col xl={9}>
-          { playState.question && 
-            <>
-              <div>{playState.question.no} of {playState.question.total}</div>
-              <h4>{playState.question.q}</h4>
-              <Row className="mb-3">
-                <Col xl={6} >
-                  <Card><CardBody>A <Button color="link" className="stretched-link" name="1" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a1}</Button></CardBody></Card>
-                </Col>
-                <Col xl={6}>
-                  <Card><CardBody>B <Button color="link" className="stretched-link" name="2" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a2}</Button></CardBody></Card>
-                </Col>
-              </Row>
-              <Row className="mb-3">
-                <Col xl={6}>
-                  <Card><CardBody>C <Button color="link" className="stretched-link" name="3" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a3}</Button></CardBody></Card>
-                </Col>
-                <Col xl={6}>
-                  <Card><CardBody>D <Button color="link" className="stretched-link" name="4" onClick={handleAnswer} disabled={playState.answered}>{playState.question.a4}</Button></CardBody></Card>
-                </Col>
-              </Row>
-            </>
-          }
-          </Col>
-          <Col xl={3}>
-            <ParticipantView participants={participants} thisParticipantId={participant.id} />
-          </Col>
-        </Row>
-      </Container>
+      <Row>
+        <Col xl={8}>
+        { playState.status === "connecting" && <Alert color="info">Establishing connection to server...</Alert> }
+        { playState.status === "connected" && <Alert color="info">Connected to server. Waiting for confirmation...</Alert> }
+        { playState.status === "joined" && <Alert color="info">Waiting for participants to join and the quiz to start...</Alert>}
+        { playState.status === "started" && <QuestionDisplay question={playState.question!} answered={playState.answered} handleAnswer={handleAnswer} /> }
+        </Col>
+        <Col xl={4}>
+          <ParticipantView participants={participants} thisParticipant={participant} />
+        </Col>
+      </Row>
     </div>
   );
 }
 
-export function ParticipantView(props: { participants: LiveParticipant[], thisParticipantId: string }) {
-  const { participants, thisParticipantId } = props;
+export function QuestionDisplay(props: { question: Question, answered: boolean, handleAnswer: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void }) {
+
+  const { question, answered, handleAnswer } = props;
 
   return (
-    <ul>
-      { participants.map((p) => 
-        <li key={p.id}>{p.id === thisParticipantId ? "YOU " : "" }{p.name} [{p.answeredCurrent ? "YES" : "NO" }] {p.isConnected ? "CONNECTED" : "DISCONNECTED" }</li>
-      )}
-    </ul>
+    <>
+    <div>{question.no} of {question.total}</div>
+    <h4>{question.q}</h4>
+    <Row className="mb-3" noGutters>
+      <Col xl={6} >
+        <Card><CardBody>A <Button color="link" className="stretched-link" name="1" onClick={handleAnswer} disabled={answered}>{question.a1}</Button></CardBody></Card>
+      </Col>
+      <Col xl={6}>
+        <Card><CardBody>B <Button color="link" className="stretched-link" name="2" onClick={handleAnswer} disabled={answered}>{question.a2}</Button></CardBody></Card>
+      </Col>
+    </Row>
+    <Row className="mb-3" noGutters>
+      <Col xl={6}>
+        <Card><CardBody>C <Button color="link" className="stretched-link" name="3" onClick={handleAnswer} disabled={answered}>{question.a3}</Button></CardBody></Card>
+      </Col>
+      <Col xl={6}>
+        <Card><CardBody>D <Button color="link" className="stretched-link" name="4" onClick={handleAnswer} disabled={answered}>{question.a4}</Button></CardBody></Card>
+      </Col>
+    </Row>
+  </>
+
   );
-}
-
-type PlayState = {
-  status: "connecting" | "connected" | "joined" | "started" | "finished",
-  question?: Question,
-  answered: boolean
-}
-
-type Question = {
-  q: string, 
-  a1: string, 
-  a2: string, 
-  a3: string, 
-  a4: string, 
-  no: number, 
-  total: number
-}
-
-type ParticipantList = {
-  participants: LiveParticipant[]
-}
-
-type LiveParticipant = {
-  id: string,
-  name: string,
-  answeredCurrent: string,
-  isConnected: boolean
 }

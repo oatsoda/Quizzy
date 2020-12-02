@@ -44,14 +44,16 @@ export function PagePlay() {
   return (
     <>
       <MenuBar />
-      <Container fluid={true}>
+      <Container>
         <Loader isLoading={isLoading} />
         <ErrorDisplay errorMessage={errorMessage} />
+        <h1>Playing: {competition?.quiz.name}</h1>
         { competition && !participant &&
-          <CreateParticipant competition={competition} onParticipantCreated={handleParticipantCreated} onCancel={handleCancelCreateParticipant}  />
+          <>
+            <CreateParticipant competition={competition} onParticipantCreated={handleParticipantCreated} onCancel={handleCancelCreateParticipant}  />          
+            <p>Participant details required...</p>
+          </>
         }
-        <h1>Quiz {competition?.quiz.name}</h1>
-        <h2>You: {participant?.name} {participant?.email}</h2>
         { competition && participant &&
           <LiveQuiz competition={competition} participant={participant} />
         }

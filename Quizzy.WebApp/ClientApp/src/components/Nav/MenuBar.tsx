@@ -8,7 +8,7 @@ export function MenuBar() {
   const toggleNavbar = () => setCollapsed(!collapsed);
   
     return (
-      <Navbar color="dark" dark expand="md">
+      <Navbar color="dark" dark expand="md" className="mb-3">
         <NavbarBrand href="/">Quizzy</NavbarBrand>
         <NavbarToggler onClick={toggleNavbar} className="mr-2" />
         <Collapse isOpen={!collapsed} navbar>

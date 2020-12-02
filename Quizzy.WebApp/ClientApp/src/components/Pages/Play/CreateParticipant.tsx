@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Label, Input } from 'reactstrap';
+import { Button, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Label, Input, Alert } from 'reactstrap';
 import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Loader } from '../../General/Loader';
 import { Competition } from '../../../api/competitionTypes';
@@ -55,18 +55,19 @@ function CreateParticipant(props: {
     <>
     <Loader isLoading={isLoading} />
     <Modal isOpen={true} id={addPersonModalId} labelledBy="addParticipantModalLabel" aria-hidden="true">
-      <ModalHeader aria-label="addParticipantModalLabel">Join Quiz: "{competition?.quiz.name}"</ModalHeader>
+      <ModalHeader aria-label="addParticipantModalLabel">Participant registration for "{competition?.quiz.name}"</ModalHeader>
       <ModalBody>
+        <Alert color="info">Your results are tied to your email address so please enter carefully.</Alert>
         <Form>
           <ErrorDisplay errorMessage={errorMessage} />
           <FormGroup>
-            <Label for="name">Name</Label>
-            <Input type="text" name="name" placeholder="Enter name" onChange={handleInputChange} />
-          </FormGroup>
-          <FormGroup>
-            <Label for="name">Email</Label>
+            <Label for="name">Your email</Label>
             <Input type="email" name="email" placeholder="Enter email" onChange={handleInputChange} />
-          </FormGroup>            
+          </FormGroup> 
+          <FormGroup>
+            <Label for="name">Display name (as others will see it)</Label>
+            <Input type="text" name="name" placeholder="Enter name" onChange={handleInputChange} />
+          </FormGroup>           
         </Form>
       </ModalBody>
       <ModalFooter>
