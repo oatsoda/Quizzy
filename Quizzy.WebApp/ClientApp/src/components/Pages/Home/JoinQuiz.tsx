@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useHistory } from 'react-router-dom'
-import { Button, FormGroup, Form, Label, Input, Alert } from 'reactstrap';
+import { Button, FormGroup, Form, Input, Alert } from 'reactstrap';
 
 import quizzesApi from '../../../api/quizzesApi';
 
@@ -39,7 +39,6 @@ export function JoinQuiz() {
     <Form className="w-100 p-3 border border-secondary rounded">
       { state.errorMessage && <Alert color="danger">{state.errorMessage}</Alert>}
       <FormGroup>
-        <Label for="join-code">Code</Label>
         <Input type="text" name="code" id="join-code" maxLength={8} value={code} placeholder="Enter 8 digit code" onChange={handleCodeChange} />
       </FormGroup>
       <FormGroup className="text-center mb-0">

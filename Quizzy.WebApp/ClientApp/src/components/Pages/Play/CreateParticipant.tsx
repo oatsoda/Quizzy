@@ -1,28 +1,30 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Label, Input, Alert } from 'reactstrap';
+import { Button, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Label, Input, Alert, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
 import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Loader } from '../../General/Loader';
 import { Competition } from '../../../api/competitionTypes';
 import { Participant, ParticipantNew, createParticipantNew } from '../../../api/participantTypes';
 import quizzesApi from '../../../api/quizzesApi';
+import { getStoredValue, storeValue } from '../../../storage/storageHelpers';
 
 const addPersonModalId: string = "personAddModal";
 
-function CreateParticipant(props: { 
+export function CreateParticipant(props: { 
                             competition?: Competition,                             
                             onParticipantCreated: (participant: Participant) => void,
                             onCancel: () => void
                         }) {
-    
-    const { competition, onParticipantCreated, onCancel } = props;
-    const [isLoading, setIsLoading] = useState(false);
-    const [newParticipant, setNewParticipant] = useState<ParticipantNew>(createParticipantNew());
-    const [errorMessage, setError] = useState<string>();
   
-    useEffect(() => {
-      setNewParticipant(createParticipantNew());
-      setError(undefined);
-    }, []);
+  const storageKey = "createParticipant";
+  const { competition, onParticipantCreated, onCancel } = props;
+  const [isLoading, setIsLoading] = useState(false);
+  const [newParticipant, setNewParticipant] = useState<ParticipantNew>(createParticipantNew());
+  const [errorMessage, setError] = useState<string>();
+
+  useEffect(() => {      
+    setNewParticipant(getStoredValue(storageKey, () => createParticipantNew()));
+    setError(undefined);
+  }, []);
 
   const saveNewParticipant = useCallback(async () => {
 
@@ -30,8 +32,11 @@ function CreateParticipant(props: {
       
       const participantCreated = await quizzesApi.putParticipant(competition!.code, newParticipant, (errMsg) => {setError(errMsg)});
 
-      if (participantCreated && onParticipantCreated) 
+      if (participantCreated && onParticipantCreated)
+      {
+        storeValue(storageKey, newParticipant);
         onParticipantCreated(participantCreated);
+      }
 
       setIsLoading(false);
     },
@@ -43,7 +48,7 @@ function CreateParticipant(props: {
   const handleInputChange = useCallback(
     (e) => {        
       const target = e.target;
-      setNewParticipant(prev => ({
+      setNewParticipant((prev: ParticipantNew) => ({
         ...prev,
         [target.name]: target.value 
       }));
@@ -62,11 +67,16 @@ function CreateParticipant(props: {
           <ErrorDisplay errorMessage={errorMessage} />
           <FormGroup>
             <Label for="name">Your email</Label>
-            <Input type="email" name="email" placeholder="Enter email" onChange={handleInputChange} />
+            <InputGroup>
+              <InputGroupAddon addonType="prepend" id="emailprepend">
+                <InputGroupText>@</InputGroupText>
+              </InputGroupAddon>
+              <Input type="email" name="email" placeholder="Enter email" aria-describedby="emailprepend" onChange={handleInputChange} value={newParticipant.email} />
+            </InputGroup>
           </FormGroup> 
           <FormGroup>
             <Label for="name">Display name (as others will see it)</Label>
-            <Input type="text" name="name" placeholder="Enter name" onChange={handleInputChange} />
+            <Input type="text" name="name" placeholder="Enter name" onChange={handleInputChange} value={newParticipant.name} />
           </FormGroup>           
         </Form>
       </ModalBody>
@@ -78,5 +88,3 @@ function CreateParticipant(props: {
     </>
   );
 }
-
-export { CreateParticipant };
