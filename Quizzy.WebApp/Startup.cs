@@ -34,7 +34,11 @@ namespace Quizzy.WebApp
 #endif
 
             services.AddCosmosDb(Configuration);
-            services.AddControllers(c => c.Filters.Add(new ResourceNotFoundExceptionFilter()))
+            services.AddControllers(c => 
+                    {
+                        c.Filters.Add(new ResourceNotFoundExceptionFilter());
+                        c.Filters.Add(new BadRequestExceptionFilter());
+                    })
                     .AddFeatureFolders()
                     .AddFluentValidation(c => c.RegisterValidatorsFromAssemblyContaining<Startup>())
                     .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));                    

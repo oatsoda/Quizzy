@@ -52,11 +52,15 @@ namespace Quizzy.WebApp.Features.Api.Competitions.Participants
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {                
                 // Validate Competition
-                if (!await m_DataQuery.Exists<Competition>(c => c.Code == command.CompetitionCode, command.CompetitionCode))
-                    throw new ResourceNotFoundException("Competition", "Code", command.CompetitionCode.ToString()); // TODO: Change to BadRequest
+                var competition = await m_DataQuery.FetchSingle<Competition>(c => c.Code == command.CompetitionCode, command.CompetitionCode);
+                if (competition == null)
+                    throw new ResourceNotFoundException("Competition", "Code", command.CompetitionCode.ToString());
 
                 // Fetch same participant if exists already (re-joining)
                 var participant = await m_DataQuery.FetchSingle<Participant>(p => p.Email == command.Email, command.CompetitionCode);
+
+                if (participant == null && competition.Status != CompetitionStatus.Open)
+                    throw new BadRequestException("Email", "Email was not registered before the quiz started. Once started, no new participants can join.");
 
                 // TODO: Validate Status of Competition (can't join if already started and didn't already join)
                 if (participant == null)

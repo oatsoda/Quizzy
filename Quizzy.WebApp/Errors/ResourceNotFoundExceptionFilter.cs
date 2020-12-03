@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Collections.Generic;
+using System.Net;
 
 namespace Quizzy.WebApp.Errors
 {
@@ -7,10 +9,19 @@ namespace Quizzy.WebApp.Errors
     {   
         public void OnException(ExceptionContext context)
         {
-            if (!(context.Exception is ResourceNotFoundException exception))
+            if (context.Exception is not ResourceNotFoundException exception)
                 return;
 
-            context.Result = new NotFoundObjectResult(exception.Message); // TODO: add problem details
+            var pd = new ProblemDetails
+            {
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+                Status = (int)HttpStatusCode.NotFound,
+                Title = "Resource could not be found."  
+            };
+            pd.Extensions["errors"] = new List<string> { exception.Message };
+
+            context.Result = new NotFoundObjectResult(pd);            
         }
     }
 }
+
