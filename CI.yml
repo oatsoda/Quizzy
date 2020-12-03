@@ -1,15 +1,17 @@
 name: CI_$(date:yyyyMMdd)$(rev:.r)
 
-trigger:
-  branches: 
-    include:
-    - main
-  paths:
-    exclude:
-    - Quizzy.Deployment/*
-    - .gitignore
-    - Full.yaml
-    - README.md
+# Re-enable trigger once Full build not deploying every time
+trigger: none
+#trigger:
+#  branches: 
+#    include:
+#    - main
+#  paths:
+#    exclude:
+#    - Quizzy.Deployment/*
+#    - .gitignore
+#    - Full.yaml
+#    - README.md
 
 pool:
   vmImage: 'windows-latest'
