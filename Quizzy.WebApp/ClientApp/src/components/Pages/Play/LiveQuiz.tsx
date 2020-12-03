@@ -43,8 +43,9 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
   useEffect(() => {
     if (hubConnection) {
 
-      hubConnection.on("joinConfirmed", (r: { participants: ParticipantList, question?: Question }) => {   
-        setPlayState(prev => ({ ...prev, status: "joined", question: r.question }));
+      hubConnection.on("joinConfirmed", (r: { participants: ParticipantList, question?: Question }) => { 
+        const joinState = r.question ? "started" : "joined";
+        setPlayState(prev => ({ ...prev, status: joinState, question: r.question }));
         setParticipants(r.participants.participants);
       });
 
@@ -97,8 +98,7 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
 
   return (
     <div>
-      <ErrorDisplay errorMessage={errorMessage} />
-      
+      <ErrorDisplay errorMessage={errorMessage} />      
       <Row>
         <Col xl={8}>
         { playState.status === "connecting" && <Alert color="info">Establishing connection to server...</Alert> }
@@ -120,21 +120,21 @@ export function QuestionDisplay(props: { question: Question, answered: boolean, 
 
   return (
     <>
-    <div>{question.no} of {question.total}</div>
-    <h4>{question.q}</h4>
-    <Row className="mb-3" noGutters>
-      <Col xl={6} >
+    <div className="font-italic">{question.no} of {question.total}</div>
+    <p className="lead font-weight-bold">{question.q}</p>
+    <Row className="mb-3">
+      <Col sm={6} className="mb-3 mb-md-0">
         <Card><CardBody>A <Button color="link" className="stretched-link" name="1" onClick={handleAnswer} disabled={answered}>{question.a1}</Button></CardBody></Card>
       </Col>
-      <Col xl={6}>
+      <Col sm={6}>
         <Card><CardBody>B <Button color="link" className="stretched-link" name="2" onClick={handleAnswer} disabled={answered}>{question.a2}</Button></CardBody></Card>
       </Col>
     </Row>
-    <Row className="mb-3" noGutters>
-      <Col xl={6}>
+    <Row className="mb-3">
+      <Col sm={6} className="mb-3 mb-md-0">
         <Card><CardBody>C <Button color="link" className="stretched-link" name="3" onClick={handleAnswer} disabled={answered}>{question.a3}</Button></CardBody></Card>
       </Col>
-      <Col xl={6}>
+      <Col sm={6}>
         <Card><CardBody>D <Button color="link" className="stretched-link" name="4" onClick={handleAnswer} disabled={answered}>{question.a4}</Button></CardBody></Card>
       </Col>
     </Row>
