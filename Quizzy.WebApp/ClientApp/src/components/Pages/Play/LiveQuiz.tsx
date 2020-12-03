@@ -6,7 +6,8 @@ import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Alert, Button, Card, CardBody, Col, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { ParticipantView } from './ParticipantView';
-import { PlayState, Question, ParticipantList, LiveParticipant, SelectedAnswer, Answers as AnswerNumber } from './playTypes';
+import { PlayState, Question, ParticipantList, LiveParticipant, SelectedAnswer, Answers as AnswerNumber, PlayStatus } from './playTypes';
+import { Loader } from '../../General/Loader';
 
 export function LiveQuiz(props: { competition: Competition, participant: Participant }) {
 
@@ -16,7 +17,7 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
   
   const [errorMessage, setError] = useState<string>();
   const [hubConnection, setHubConnection] = useState<HubConnection>();
-  const [playState, setPlayState] = useState<PlayState>({ status: "connecting", answered: false, selectedAnswer: undefined });
+  const [playState, setPlayState] = useState<PlayState>({ status: "connecting", questionLoading: false, answered: false, selectedAnswer: undefined });
   const [participants, setParticipants] = useState<LiveParticipant[]>([]);
 
   useEffect(() => {
@@ -40,13 +41,31 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
 
   }, [competition.code, competition.status, history, participant.id, playState.status])
 
+  function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+  }
+
+  const setQuestion = useCallback((q: Question, setAnswered?: boolean, setSelectedAnswer?: SelectedAnswer, setStatus?: PlayStatus) => {
+      console.log(`newQuestion: ${q.q}`);
+      setPlayState(prev => ({ ...prev, questionLoading: true, status: setStatus ?? prev.status }));
+      (async () => {
+        await delay(1000);
+        setPlayState(prev => ({ ...prev, questionLoading: false, question: q, answered: setAnswered ?? false, selectedAnswer: setSelectedAnswer, status: "started" }));
+      })();
+    },
+    []
+  );
+
   useEffect(() => {
     if (hubConnection) {
 
       hubConnection.on("joinConfirmed", (r: { participants: ParticipantList, question?: Question, currentQuestionAnswer: SelectedAnswer }) => { 
-        const joinState = r.question ? "started" : "joined";
         const answered = r.currentQuestionAnswer ? true : false;
-        setPlayState(prev => ({ ...prev, status: joinState, question: r.question, answered: answered, selectedAnswer: r.currentQuestionAnswer }));
+        if (r.question)
+          setQuestion(r.question, answered, r.currentQuestionAnswer, "joined");
+        else
+          setPlayState(prev => ({ ...prev, status: "joined"}));
+
         setParticipants(r.participants.participants);
       });
 
@@ -55,7 +74,7 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
       });
       
       hubConnection.on("started", (q: Question) => {  
-        setPlayState({ status: "started", question: q, answered: false, selectedAnswer: undefined });        
+        setPlayState({ status: "started", question: q, questionLoading: false, answered: false, selectedAnswer: undefined });        
       });
       
       hubConnection.on("participantsChanged", (p: ParticipantList) => {                  
@@ -63,12 +82,7 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
       });
 
       hubConnection.on("newQuestion", (q: Question) => {  
-        // TODO: Replace fake delay with transition / something on the UI to make people realise there is a new question!
-        console.log(`newQuestion: ${q.q}`);
-        (async () => { 
-          await delay(1000); 
-          setPlayState(prev => ({ ...prev, question: q, answered: false, selectedAnswer: undefined }));
-        })();
+        setQuestion(q);
       });
 
       hubConnection.on("finished", () => {  
@@ -82,11 +96,8 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
         })
         .catch(e => console.log('Connection failed: ', e));
     }
-  }, [hubConnection, participant.id, competition.code]);
+  }, [hubConnection, participant.id, competition.code, setQuestion]);
   
-  function delay(ms: number) {
-    return new Promise( resolve => setTimeout(resolve, ms) );
-  }
 
   const handleAnswer = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => { 
@@ -100,18 +111,22 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
 
   return (
     <div>
-      <ErrorDisplay errorMessage={errorMessage} />      
-      <Row>
-        <Col xl={8}>
-        { playState.status === "connecting" && <Alert color="info">Establishing connection to server...</Alert> }
-        { playState.status === "connected" && <Alert color="info">Connected to server. Waiting for confirmation...</Alert> }
-        { playState.status === "joined" && <Alert color="info">Waiting for participants to join and the quiz to start...</Alert>}
-        { playState.status === "started" && <QuestionDisplay question={playState.question!} answered={playState.answered} selectedAnswer={playState.selectedAnswer} handleAnswer={handleAnswer} /> }
-        </Col>
-        <Col xl={4}>
-          <ParticipantView participants={participants} thisParticipant={participant} />
-        </Col>
-      </Row>
+      { playState.status === "connecting" && <Alert color="info">Establishing connection to server...</Alert>}
+      { playState.status === "connected" && <Alert color="info">Connected to server. Waiting for confirmation...</Alert>}
+      <div className="loading-parent">
+        <ErrorDisplay errorMessage={errorMessage} />
+        <Row>
+          <Col xl={8} className="loading-parent">
+            { playState.status === "joined" && <Alert color="info">Waiting for participants to join and the quiz to start...</Alert>}
+            { playState.status === "started" && playState.question && <QuestionDisplay question={playState.question!} answered={playState.answered} selectedAnswer={playState.selectedAnswer} handleAnswer={handleAnswer} />}
+            <Loader isLoading={playState.questionLoading} />
+          </Col>
+          <Col xl={4}>
+            <ParticipantView participants={participants} thisParticipant={participant} />
+          </Col>
+        </Row>
+        <Loader isLoading={playState.status === "connecting" || playState.status === "connected" } />
+      </div>
     </div>
   );
 }

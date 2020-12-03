@@ -35,7 +35,7 @@ namespace Quizzy.WebApp.Data.Entities
         }
 
         [JsonConstructor]
-        private Participant(Guid id, string compId, string email, bool isConnected, string clientId, Dictionary<int, ParticipantAnswer> answers)
+        private Participant(Guid id, string compId, string email, bool isConnected, string clientId, int totalAnswers, int correctAnswers, Dictionary<int, ParticipantAnswer> answers)
         {
             Id = id;
             CompId = compId;
@@ -43,6 +43,8 @@ namespace Quizzy.WebApp.Data.Entities
             IsConnected = isConnected;
             ClientId = clientId;
             Answers = answers;
+            TotalAnswers = totalAnswers;
+            CorrectAnswers = correctAnswers;
         }
 
         public void Answer(int questionNo, int answer, bool isCorrect)
