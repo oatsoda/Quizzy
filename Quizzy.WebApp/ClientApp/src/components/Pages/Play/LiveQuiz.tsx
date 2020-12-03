@@ -138,7 +138,7 @@ export function QuestionDisplay(props: { question: Question, answered: boolean, 
 
 function AnswerDisplay(props: { answerNumber: AnswerNumber, answerText: string, answered: boolean, selectedAnswer: SelectedAnswer, addMarginBottom: boolean, handleAnswer: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void }) {
   const { answerNumber, answerText, answered, selectedAnswer, addMarginBottom, handleAnswer } = props;
-  const answerLetter = String.fromCharCode(64 + answerNumber);
+  const answerLetter = 'ABCD'[answerNumber - 1];
   const cardClassName = answerNumber === selectedAnswer ? `bg-primary text-white ${answerLetter}` : answerLetter;
   const buttonClassName = answerNumber === selectedAnswer ? "stretched-link text-white font-weight-bold" : "stretched-link";
   return (
