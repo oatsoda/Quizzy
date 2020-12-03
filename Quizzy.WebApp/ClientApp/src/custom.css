@@ -10,6 +10,11 @@
 .card.D {
   background-color: lavenderblush;
 }
+
+.bg-wrong {
+  background-color: honeydew;
+}
+
 button.disabled:hover {
   text-decoration: none;
 }

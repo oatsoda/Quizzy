@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container } from 'reactstrap';
+import { Card, CardBody, Col, Container, Row } from 'reactstrap';
 import { ParticipantResult, ParticipantResultQuestion } from '../../../api/participantTypes';
 import quizzesApi from '../../../api/quizzesApi';
 import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Loader } from '../../General/Loader';
 import { MenuBar } from '../../Nav/MenuBar';
+import { AnswerNumber, SelectedAnswer } from '../Play/playTypes';
 
 export function PageResults() {
   
@@ -32,20 +33,18 @@ export function PageResults() {
     setIsLoading(false);
   }
 
-
   return (
     <>
       <MenuBar />
       <Loader isLoading={isLoading} />
         <Container>
         <ErrorDisplay errorMessage={errorMessage} />
-        <h1>Results</h1>
+        <h1>Results{ participantResult && <span className="text-muted"> for {participantResult.participantName}</span> }</h1>
         { participantResult && <> 
-            <h2>Name: {participantResult.participantName}</h2>
-            <h3>Score: {participantResult.totalCorrect} of {participantResult.totalQuestions}</h3>
+            <h3 className="display-4 mb-3">Score: {participantResult.totalCorrect} of {participantResult.totalQuestions}</h3>
             {
-              participantResult.questions.map(q => (
-                <QuestionResult result={q} />
+              participantResult.questions.map((q, i) => (
+                <QuestionResult key={i} number={i+1} result={q} />
               ))
             }
         </>}
@@ -54,18 +53,38 @@ export function PageResults() {
   );
 }
 
-function QuestionResult(props: { result: ParticipantResultQuestion }) {
-  const { result } = props;
+function QuestionResult(props: { number: number, result: ParticipantResultQuestion }) {
+  const { number, result } = props;
   return (
     <>
-      <p>Q: {result.q} {result.isCorrect && ' CORRECT'}</p>
-      {!result.isCorrect && 
-        <ul>
-          <li>{result.a1} {result.correctA === 1 && ' Correct Answer'}{result.participantA === 1 && ' Wrong Answer'}</li>
-          <li>{result.a2} {result.correctA === 2 && ' Correct Answer'}{result.participantA === 2 && ' Wrong Answer'}</li>
-          <li>{result.a3} {result.correctA === 3 && ' Correct Answer'}{result.participantA === 3 && ' Wrong Answer'}</li>
-          <li>{result.a4} {result.correctA === 4 && ' Correct Answer'}{result.participantA === 4 && ' Wrong Answer'}</li>
-        </ul>}
+      <p className="lead font-weight-bold">{number}. {result.q}</p>
+      <Row className="mb-3">
+        <AnswerDisplay answerNumber={1} answerText={result.a1} selectedAnswer={result.participantA as SelectedAnswer} correctAnswer={result.correctA} addMarginBottom={true} />
+        <AnswerDisplay answerNumber={2} answerText={result.a2} selectedAnswer={result.participantA as SelectedAnswer} correctAnswer={result.correctA} addMarginBottom={false} />
+      </Row>
+      <Row className="mb-5">
+        <AnswerDisplay answerNumber={3} answerText={result.a3} selectedAnswer={result.participantA as SelectedAnswer} correctAnswer={result.correctA} addMarginBottom={true} />
+        <AnswerDisplay answerNumber={4} answerText={result.a4} selectedAnswer={result.participantA as SelectedAnswer} correctAnswer={result.correctA} addMarginBottom={false} />
+      </Row>
     </>
+  );
+}
+
+function AnswerDisplay(props: { answerNumber: AnswerNumber, answerText: string, selectedAnswer: SelectedAnswer, correctAnswer: AnswerNumber, addMarginBottom: boolean }) {
+  const { answerNumber, answerText, selectedAnswer, correctAnswer, addMarginBottom } = props;
+  const answerLetter = 'ABCD'[answerNumber - 1];
+  const cardClassName = answerNumber === correctAnswer && correctAnswer === selectedAnswer
+    ? "bg-success text-white"
+    : answerNumber === correctAnswer
+      ? "bg-wrong"
+      : answerNumber === selectedAnswer 
+        ? `bg-danger text-white`
+        : "";
+  return (
+    <Col sm={6} className={addMarginBottom ? "mb-3 mb-md-0" : "" }>
+      <Card className={cardClassName}>
+        <CardBody>{answerLetter} {answerText}</CardBody>
+      </Card>
+    </Col>
   );
 }

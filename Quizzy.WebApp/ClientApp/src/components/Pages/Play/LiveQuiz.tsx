@@ -6,7 +6,7 @@ import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Alert, Button, Card, CardBody, Col, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { ParticipantView } from './ParticipantView';
-import { PlayState, Question, ParticipantList, LiveParticipant, SelectedAnswer, Answers as AnswerNumber, PlayStatus } from './playTypes';
+import { PlayState, Question, ParticipantList, LiveParticipant, SelectedAnswer, AnswerNumber, PlayStatus } from './playTypes';
 import { Loader } from '../../General/Loader';
 
 export function LiveQuiz(props: { competition: Competition, participant: Participant }) {

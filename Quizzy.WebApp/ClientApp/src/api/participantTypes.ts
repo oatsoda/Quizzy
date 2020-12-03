@@ -1,3 +1,4 @@
+import { AnswerNumber, SelectedAnswer } from "../components/Pages/Play/playTypes";
 
 export type Participant = {
   id: string;
@@ -37,7 +38,7 @@ export type ParticipantResultQuestion = {
   a2: string,
   a3: string,
   a4: string, 
-  correctA: number,
-  participantA: number,
+  correctA: AnswerNumber,
+  participantA: SelectedAnswer,
   isCorrect: boolean
 }

@@ -8,8 +8,8 @@ export type PlayState = {
 
 export type PlayStatus = "connecting" | "connected" | "joined" | "started" | "finished";
 
-export type Answers = 1 | 2 | 3 | 4;
-export type SelectedAnswer = undefined | Answers;
+export type AnswerNumber = 1 | 2 | 3 | 4;
+export type SelectedAnswer = undefined | AnswerNumber;
 
 export type Question = {
   q: string, 

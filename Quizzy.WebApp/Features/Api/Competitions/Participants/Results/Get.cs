@@ -5,6 +5,7 @@ using Quizzy.WebApp.DomainInfrastructure;
 using Quizzy.WebApp.Errors;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,7 +41,7 @@ namespace Quizzy.WebApp.Features.Api.Competitions.Participants.Results
                 public string A3 { get; set; }
                 public string A4 { get; set; }
                 public int CorrectA { get; set; }
-                public int ParticipantA { get; set; }
+                public int? ParticipantA { get; set; }
                 public bool IsCorrect { get; set; }
             }
         }
@@ -89,11 +90,11 @@ namespace Quizzy.WebApp.Features.Api.Competitions.Participants.Results
                 };
 
                 // TODO: Hmm, reliant on quiz entity serialisation in correct order?
-                var x = 1;
+                var x = 0;
                 var c = 0;
-                foreach (var question in result.Questions)
-                {
-                    var participantAnswer = participant.Answers[x++];
+                foreach (var question in result.Questions.Where(q => participant.Answers.ContainsKey(++x)))
+                {                    
+                    var participantAnswer = participant.Answers[x];
                     question.ParticipantA = participantAnswer.A;
                     question.IsCorrect = participantAnswer.IsCorrect;
                     if (participantAnswer.IsCorrect)
