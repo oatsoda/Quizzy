@@ -2,7 +2,11 @@ export type PlayState = {
   status: "connecting" | "connected" | "joined" | "started" | "finished";
   question?: Question;
   answered: boolean;
+  selectedAnswer: SelectedAnswer;
 };
+
+export type Answers = 1 | 2 | 3 | 4;
+export type SelectedAnswer = undefined | Answers;
 
 export type Question = {
   q: string, 

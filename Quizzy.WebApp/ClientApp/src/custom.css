@@ -1,14 +1,15 @@
-/* Provide sufficient contrast against white background */
-/* a {
-  color: #0366d6;
+.card.A {
+  background-color: lemonchiffon;
 }
-
-code {
-  color: #E01A76;
+.card.B {
+  background-color: lightcyan;
 }
-
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
-} */
+.card.C {
+  background-color: honeydew;
+}
+.card.D {
+  background-color: lavenderblush;
+}
+button.disabled:hover {
+  text-decoration: none;
+}

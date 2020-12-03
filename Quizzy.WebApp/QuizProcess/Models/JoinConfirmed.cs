@@ -4,6 +4,7 @@
     {
         public ParticipantList Participants { get; set; }
         public Question Question { get; set; }
+        public int? CurrentQuestionAnswer { get; set; }
     }
 
 }

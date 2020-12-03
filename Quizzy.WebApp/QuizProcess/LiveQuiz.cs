@@ -59,7 +59,10 @@ namespace Quizzy.WebApp.QuizProcess
             var confirmation = new JoinConfirmed { Participants = participantList };
 
             if (m_Competition.Status == CompetitionStatus.Started)
+            {
                 confirmation.Question = GetCurrentQuestion();
+                confirmation.CurrentQuestionAnswer = participant.Answers.ContainsKey(CurrentQuestion) ? participant.Answers[CurrentQuestion]?.A : null;
+            }
 
             await m_ParticipantNotifier.NotifyParticipantsChanged(participant.CompId, participantList, clientId);
 
@@ -144,7 +147,8 @@ namespace Quizzy.WebApp.QuizProcess
         private async Task<bool> AllAnswered()
         {
             // TODO: Why is quNo param not working (Due to double quotes?)
-            var query = new QueryDefinition($"SELECT VALUE COUNT(c) FROM c WHERE c.CompId = @code and c.Discriminator = @disc and not IS_DEFINED(c.Answers[\"{CurrentQuestion}\"])")
+            // TODO: Filtering by connected, but probably remove and have a max time limit.
+            var query = new QueryDefinition($"SELECT VALUE COUNT(c) FROM c WHERE c.CompId = @code AND c.Discriminator = @disc AND c.IsConnected = true AND NOT IS_DEFINED(c.Answers[\"{CurrentQuestion}\"])")
                 .WithParameter("@code", m_Competition.Code)
                 .WithParameter("@disc", Participant.DiscriminatorValue)
                 .WithParameter("@quNo", CurrentQuestion);
