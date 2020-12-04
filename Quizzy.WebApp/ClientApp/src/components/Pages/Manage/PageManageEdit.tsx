@@ -6,6 +6,7 @@ import quizzesApi from '../../../api/quizzesApi';
 import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Loader } from '../../General/Loader';
 import { MenuBar } from '../../Nav/MenuBar';
+import paths from '../../Config/paths';
 
 export function PageManageEdit() {
   
@@ -40,7 +41,7 @@ export function PageManageEdit() {
       const newCompetition = await quizzesApi.postQuizCompetition(id, (errMsg) => { setError(errMsg); });
 
       if (newCompetition)
-        history.push(`/manage/${id}/${newCompetition.code}`);
+        history.push(paths.ManageCompetition(id, newCompetition.code));
 
       setIsLoading(false);
     },

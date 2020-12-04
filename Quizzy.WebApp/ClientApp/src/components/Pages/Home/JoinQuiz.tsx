@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom'
 import { Button, FormGroup, Form, Input, Alert } from 'reactstrap';
 
 import quizzesApi from '../../../api/quizzesApi';
+import paths from '../../Config/paths';
 
 export function JoinQuiz() {
 
@@ -31,7 +32,7 @@ export function JoinQuiz() {
       else if (competition?.status === "finished")
         setState({ buttonEnabled: true, loading: false, errorMessage: "This quiz has finished." });
       else if (competition) 
-        history.push(`/quiz/${code}`);
+        history.push(paths.PlayCompetition(code));
     }, 
     [code, history]);
 

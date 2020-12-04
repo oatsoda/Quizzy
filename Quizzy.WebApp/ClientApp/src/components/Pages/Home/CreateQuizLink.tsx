@@ -1,14 +1,15 @@
 import React, { useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, FormGroup, Form } from 'reactstrap';
-
+import paths from '../../Config/paths';
 
 export function CreateQuizLink() {
 
   const history = useHistory();
 
-  const handleButtonClick = useCallback(async () => {      
-    history.push(`/manage/`);
+  const handleButtonClick = useCallback(async () => {  
+       
+    history.push(paths.CreateQuiz);
   }, 
   [history]);
 

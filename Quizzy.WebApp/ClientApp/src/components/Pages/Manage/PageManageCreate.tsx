@@ -3,7 +3,7 @@ import { Container } from 'reactstrap';
 import { MenuBar } from '../../Nav/MenuBar';
 import { CreateQuiz } from './CreateQuiz';
 
-export function PageManage() {
+export function PageManageCreate() {
   
   return (
     <>

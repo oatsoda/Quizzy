@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Collapse, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
+import paths from '../Config/paths';
 
 export function MenuBar() {
 
@@ -14,7 +15,7 @@ export function MenuBar() {
         <Collapse isOpen={!collapsed} navbar>
           <Nav className="mr-auto" navbar>
             <NavItem>
-              <NavLink href="/manage/">Create</NavLink>
+              <NavLink href={paths.CreateQuiz}>Create</NavLink>
             </NavItem>            
           </Nav>
         </Collapse>

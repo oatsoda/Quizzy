@@ -5,6 +5,7 @@ import { QuizNew, createQuizNew, QuizQuestion } from '../../../api/quizTypes';
 import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { useHistory } from 'react-router-dom';
 import { Loader } from '../../General/Loader';
+import paths from '../../Config/paths';
 
 
 export function CreateQuiz() {
@@ -21,7 +22,7 @@ export function CreateQuiz() {
       const quizCreated = await quizzesApi.postQuiz(newQuiz, (errMsg) => { setError(errMsg); });
 
       if (quizCreated)
-        history.push(`/manage/${quizCreated.id}`);
+        history.push(paths.ManageQuiz(quizCreated.id));
 
       setIsLoading(false);
     },
