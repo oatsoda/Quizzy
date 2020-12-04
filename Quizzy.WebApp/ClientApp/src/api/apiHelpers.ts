@@ -1,4 +1,5 @@
 import { AxiosResponse } from 'axios';
+import { IValidationErrors } from './validationTypes';
 
 export function processResponseAxios<T>(response: AxiosResponse<T>): Promise<ProcessedResponseOf<T>> {
 
@@ -28,11 +29,20 @@ export function getProblemDetailErrors(response: ProcessedResponse) {
 
   let errMsg : string[] = []
   for (let [propName, errors] of Object.entries( response.data.errors)) {
-      console.log(errors);
-      errMsg.push(`${propName}: ${errors}`) // TODO: errors is actually Array
+      errMsg.push(`${propName}: ${errors}`) // errors is actually Array
   }
 
   return errMsg.join("; "); 
+}
+
+export function getProblemDetails(response: ProcessedResponse) {
+  let errors : IValidationErrors = {}
+  for (let [propName, propErrors] of Object.entries( response.data.errors)) {
+    propName = propName.charAt(0).toLowerCase() + propName.slice(1);
+    errors[propName] = propErrors as string[];
+  }
+
+  return errors; 
 }
 
 export function flattenApiError(response: ProcessedResponse) : string {
@@ -45,4 +55,14 @@ export function flattenApiError(response: ProcessedResponse) : string {
       return `Request failed: ${response.status}`;
   }        
 }
+
+export function handleError(response: ProcessedResponse, onError: (error: string) => void, onValidationError: (errors: IValidationErrors) => void) {
+  if  (response.status === 400) {
+    let err = getProblemDetails(response);
+    onValidationError(err);
+  } else {
+    onError(`Request failed: ${response.status}`);
+  }
+}
+
 

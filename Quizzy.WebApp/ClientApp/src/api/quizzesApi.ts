@@ -1,7 +1,8 @@
 import Axios from 'axios'
 import { Competition, CompetitionOnly } from './competitionTypes';
 import { ParticipantNew, Participant, ParticipantResult } from './participantTypes';
-import { processResponseAxios, flattenApiError } from './apiHelpers';
+import { processResponseAxios, flattenApiError, handleError } from './apiHelpers';
+import { IValidationErrors } from "./validationTypes";
 import { Quiz, QuizNew } from './quizTypes';
 
 const apiBaseUrl = "api/";
@@ -24,13 +25,13 @@ export class QuizzesApi {
                         }
                         else {
                             const errMsg = flattenApiError(error)
-                            onError(`Oops, something went wrong [${error.status} - ${errMsg}]`);
+                            onError(`Oops, something went wrong [${errMsg}]`);
                         }
                         return undefined;
                       });
   }
 
-  async putParticipant(code: string, participant: ParticipantNew, onError: (error: string) => void) : Promise<Participant | undefined> {
+  async putParticipant(code: string, participant: ParticipantNew, onError: (error: string) => void, onValidationError: (errors: IValidationErrors) => void) : Promise<Participant | undefined> {
 
     const url = `${apiBaseUrl}competitions/${code}/participants/`;
 
@@ -41,8 +42,7 @@ export class QuizzesApi {
                         return response.data;
                       }) 
                       .catch(error => {                        
-                        const errMsg = flattenApiError(error);
-                        onError(`Oops, something went wrong [${error.status} - ${errMsg}]`);                        
+                        handleError(error, onError, onValidationError);                       
                         return undefined;
                       });
   }
@@ -59,7 +59,7 @@ export class QuizzesApi {
                       }) 
                       .catch(error => {                        
                         const errMsg = flattenApiError(error);
-                        onError(`Oops, something went wrong [${error.status} - ${errMsg}]`);                        
+                        onError(`Oops, something went wrong [${errMsg}]`);                        
                         return undefined;
                       });
   }
@@ -76,7 +76,7 @@ export class QuizzesApi {
                       }) 
                       .catch(error => {                        
                         const errMsg = flattenApiError(error);
-                        onError(`Oops, something went wrong [${error.status} - ${errMsg}]`);                        
+                        onError(`Oops, something went wrong [${errMsg}]`);                        
                         return undefined;
                       });
   }
@@ -97,7 +97,7 @@ export class QuizzesApi {
                         }
                         else {
                             const errMsg = flattenApiError(error)
-                            onError(`Oops, something went wrong [${error.status} - ${errMsg}]`);
+                            onError(`Oops, something went wrong [${errMsg}]`);
                         }
                         return undefined;
                       });
@@ -115,7 +115,7 @@ export class QuizzesApi {
                       }) 
                       .catch(error => {                        
                         const errMsg = flattenApiError(error);
-                        onError(`Oops, something went wrong [${error.status} - ${errMsg}]`);                        
+                        onError(`Oops, something went wrong [${errMsg}]`);                        
                         return undefined;
                       });
   }
@@ -136,7 +136,7 @@ export class QuizzesApi {
                         }
                         else {
                             const errMsg = flattenApiError(error)
-                            onError(`Oops, something went wrong [${error.status} - ${errMsg}]`);
+                            onError(`Oops, something went wrong [${errMsg}]`);
                         }                        
                         return undefined;
                       });
@@ -154,7 +154,7 @@ export class QuizzesApi {
                       })
                       .catch(error => {                        
                         const errMsg = flattenApiError(error);
-                        onError(`Oops, something went wrong [${error.status} - ${errMsg}]`);                        
+                        onError(`Oops, something went wrong [${errMsg}]`);                        
                         return false;
                       });
   }

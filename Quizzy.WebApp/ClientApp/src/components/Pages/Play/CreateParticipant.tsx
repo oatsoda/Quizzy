@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Label, Input, Alert, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
+import { Button, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Label, Input, Alert, InputGroupAddon, InputGroupText, InputGroup, FormFeedback } from 'reactstrap';
 import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Loader } from '../../General/Loader';
 import { Competition } from '../../../api/competitionTypes';
 import { Participant, ParticipantNew, createParticipantNew } from '../../../api/participantTypes';
 import quizzesApi from '../../../api/quizzesApi';
 import { getStoredValue, storeValue } from '../../../storage/storageHelpers';
+import { IValidationErrors } from "../../../api/validationTypes";
 
 const addPersonModalId: string = "personAddModal";
 
@@ -20,6 +21,7 @@ export function CreateParticipant(props: {
   const [isLoading, setIsLoading] = useState(false);
   const [newParticipant, setNewParticipant] = useState<ParticipantNew>(createParticipantNew());
   const [errorMessage, setError] = useState<string>();
+  const [validationErrors, setValidationErrors] = useState<IValidationErrors>();
 
   useEffect(() => {      
     setNewParticipant(getStoredValue(storageKey, () => createParticipantNew()));
@@ -30,7 +32,7 @@ export function CreateParticipant(props: {
 
       setIsLoading(true);
       
-      const participantCreated = await quizzesApi.putParticipant(competition!.code, newParticipant, (errMsg) => {setError(errMsg)});
+      const participantCreated = await quizzesApi.putParticipant(competition!.code, newParticipant, setError, setValidationErrors);
 
       if (participantCreated && onParticipantCreated)
       {
@@ -71,12 +73,14 @@ export function CreateParticipant(props: {
               <InputGroupAddon addonType="prepend" id="emailprepend">
                 <InputGroupText>@</InputGroupText>
               </InputGroupAddon>
-              <Input type="email" name="email" placeholder="Enter email" aria-describedby="emailprepend" onChange={handleInputChange} value={newParticipant.email} />
+              <Input invalid={validationErrors && validationErrors["email"] ? true : false} type="email" name="email" placeholder="Enter email" aria-describedby="emailprepend" onChange={handleInputChange} value={newParticipant.email} />
+              { validationErrors && validationErrors["email"] && <FormFeedback>{validationErrors["email"][0]}</FormFeedback> }
             </InputGroup>
           </FormGroup> 
           <FormGroup>
             <Label for="name">Display name (as others will see it)</Label>
-            <Input type="text" name="name" placeholder="Enter name" onChange={handleInputChange} value={newParticipant.name} />
+            <Input invalid={validationErrors && validationErrors["name"] ? true : false} type="text" name="name" placeholder="Enter name" onChange={handleInputChange} value={newParticipant.name} />
+            { validationErrors && validationErrors["name"] && <FormFeedback>{validationErrors["name"][0]}</FormFeedback> }
           </FormGroup>           
         </Form>
       </ModalBody>
