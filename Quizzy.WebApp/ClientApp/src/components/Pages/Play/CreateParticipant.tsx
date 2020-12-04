@@ -30,18 +30,18 @@ export function CreateParticipant(props: {
 
   const saveNewParticipant = useCallback(async () => {
 
-      setIsLoading(true);
-      
-      const participantCreated = await quizzesApi.putParticipant(competition!.code, newParticipant, setError, setValidationErrors);
+    setIsLoading(true);
 
-      if (participantCreated && onParticipantCreated)
-      {
-        storeValue(storageKey, newParticipant);
-        onParticipantCreated(participantCreated);
-      }
+    const participantCreated = await quizzesApi.putParticipant(competition!.code, newParticipant, setError, setValidationErrors);
 
+    if (participantCreated && onParticipantCreated) {
+      storeValue(storageKey, newParticipant);
+      onParticipantCreated(participantCreated);
+    }
+    else {
       setIsLoading(false);
-    },
+    }
+  },
     [competition, newParticipant, onParticipantCreated]
   );
   
