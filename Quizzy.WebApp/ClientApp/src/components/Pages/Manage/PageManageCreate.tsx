@@ -9,7 +9,7 @@ export function PageManageCreate() {
     <>
       <MenuBar />
       <Container>
-        <h1>Start or Build a new Quiz</h1>
+        <h1>Create a new Quiz</h1>
         <CreateQuiz />
       </Container>
     </>

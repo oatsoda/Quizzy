@@ -1,3 +1,5 @@
+import { SelectedAnswer } from "../components/Pages/Play/playTypes"
+
 export type Quiz = QuizNew & {
   id: string
 }
@@ -15,7 +17,7 @@ export type QuizQuestion = {
   a2?: string,
   a3?: string,
   a4?: string, 
-  correctA?: number
+  correctA?: SelectedAnswer
 }
 
 
@@ -24,6 +26,6 @@ export function createQuizNew() : QuizNew {
     name: "",
     creatorName: "",
     creatorEmail: "",
-    questions: [{ }, {}] // Hack: 2 qs on UI for now
+    questions: []
   }
 }
