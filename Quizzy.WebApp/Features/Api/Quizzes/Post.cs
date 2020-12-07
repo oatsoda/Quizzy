@@ -42,6 +42,31 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
                     .NotEmpty();
                 RuleFor(c => c.CreatorName)
                     .NotEmpty();
+                RuleFor(c => c.Questions)
+                    .NotEmpty();
+                RuleForEach(c => c.Questions)
+                    .SetValidator(new QuestionValidator())
+                    .When(c => c.Questions != null);
+            }
+        }
+
+        public class QuestionValidator : AbstractValidator<Command.Question> 
+        {
+            public QuestionValidator()
+            {
+                RuleFor(q => q.Q)
+                    .NotEmpty();                
+                RuleFor(q => q.A1)
+                    .NotEmpty()
+                    ;// TODO: Check unique answers e.g. .Must((q, a1) => a1 != q.A2 ...).WithMessage(...);                
+                RuleFor(q => q.A2)
+                    .NotEmpty();                
+                RuleFor(q => q.A3)
+                    .NotEmpty();                
+                RuleFor(q => q.A4)
+                    .NotEmpty();                
+                RuleFor(q => q.CorrectA)
+                    .InclusiveBetween(1, 4);
             }
         }
 
