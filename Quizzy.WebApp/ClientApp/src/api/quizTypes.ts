@@ -8,10 +8,10 @@ export type QuizNew = {
   name: string,
   creatorName: string,
   creatorEmail: string
-  questions: QuizQuestionNew[]
+  questions: QuizQuestion[]
 }
 
-export type QuizQuestionNew = {
+export type QuizQuestion = {
   q: string,
   a1: string,
   a2: string,
@@ -30,7 +30,7 @@ export function createQuizNew() : QuizNew {
   }
 }
 
-export function createQuizQuestionNew() : QuizQuestionNew {
+export function createQuizQuestionNew() : QuizQuestion {
   return {
     q: "",
     a1: "",

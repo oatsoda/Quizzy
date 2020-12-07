@@ -7,6 +7,7 @@ import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Loader } from '../../General/Loader';
 import { MenuBar } from '../../Nav/MenuBar';
 import paths from '../../Config/paths';
+import { EditQuiz } from './EditQuiz';
 
 export function PageManageEdit() {
   
@@ -49,16 +50,27 @@ export function PageManageEdit() {
   );
 
   // TODO: Probably need a way to list all competitions?  Depends whether it's going to just email links rather than have a "manage" page.
+  // TODO: Probably need to prevent editing when there is a competition open
   
   return (
     <>
       <MenuBar />
-      <Loader isLoading={isLoading} />
       <Container>
+        <h1>Quiz: {quiz?.name}</h1>        
+        <Loader isLoading={isLoading} />
         <ErrorDisplay errorMessage={errorMessage} />
-        <h1>Quiz: {quiz?.name}</h1>
-        <Button onClick={handleButtonClick} color="primary">Create a code</Button>
+
+        <h3 className="mb-2">Manage competitions</h3>
+        <div className="border rounded p-3 mb-3">
+          <Button onClick={handleButtonClick} color="primary">Create a code</Button>
+        </div>     
+
+        <h3 className="mb-3">Update quiz</h3>
+        { quiz &&
+          <EditQuiz quiz={quiz} />
+        }
       </Container>
     </>
   );
 }
+
