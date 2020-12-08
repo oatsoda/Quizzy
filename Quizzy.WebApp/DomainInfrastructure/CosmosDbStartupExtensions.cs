@@ -44,7 +44,7 @@ namespace Quizzy.WebApp.DomainInfrastructure
 
     public class CosmosRequestHandler : RequestHandler
     {
-        public override Task<ResponseMessage> SendAsync(RequestMessage request, CancellationToken cancellationToken) 
+        public override async Task<ResponseMessage> SendAsync(RequestMessage request, CancellationToken cancellationToken) 
         {
 #if DEBUG
             if (request.Content != null)
@@ -52,14 +52,17 @@ namespace Quizzy.WebApp.DomainInfrastructure
                 using var ms = new MemoryStream();
                 request.Content.CopyTo(ms);
                 var q = Encoding.UTF8.GetString(ms.ToArray());
-                Console.WriteLine($"[{request.Headers.RequestCharge} RU] {request.Method} {request.RequestUri} : {q}");
+                Console.WriteLine($"{request.Method} {request.RequestUri} : {q}");
             }
             else
             {
-                Console.WriteLine($"[{request.Headers.RequestCharge} RU] {request.Method} {request.RequestUri} : null");
+                Console.WriteLine($"{request.Method} {request.RequestUri} : null");
             }
 #endif
-            return base.SendAsync(request, cancellationToken);
+            var response = await base.SendAsync(request, cancellationToken);
+            Console.WriteLine($"{response.Headers.RequestCharge} RUs");
+
+            return response;
         }
     }
 }
