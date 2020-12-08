@@ -9,6 +9,7 @@ namespace Quizzy.WebApp.Features.Api.Competitions
         {
             CreateMap<Competition, Get.Result>();
             CreateMap<Quiz, Get.Result.ResultQuiz>();
+            CreateMap<Participant, Get.Result.ResultOutcomeLeader>();
         }
     }
 }

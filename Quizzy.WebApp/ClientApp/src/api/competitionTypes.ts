@@ -6,6 +6,7 @@ export type CompetitionOnly = { // TODO: rename
 
 export type Competition = CompetitionOnly & {
   quiz: CompetitionQuiz;
+  outcome: CompetitionOutcome
 };
 
 export type CompetitionQuiz = {
@@ -16,3 +17,15 @@ export type CompetitionQuiz = {
 }
 
 export type CompetitionStatus = "new" | "open" | "started" | "finished";
+
+export type CompetitionOutcome = {
+  totalQuestions: number,
+  first: CompetitionOutcomeLeader,
+  second?: CompetitionOutcomeLeader,
+  third?: CompetitionOutcomeLeader,
+}
+
+export type CompetitionOutcomeLeader = {
+  name: string,
+  correctAnswers: number
+}

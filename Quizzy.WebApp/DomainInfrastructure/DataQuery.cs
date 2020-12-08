@@ -18,7 +18,7 @@ namespace Quizzy.WebApp.DomainInfrastructure
                                           .GetContainer(s_TypeContainers[typeof(T)]);
 
             var feedIterator = container.GetItemLinqQueryable<T>(requestOptions: new QueryRequestOptions { PartitionKey = partitionKey.ToPartitionKey(), MaxItemCount = 2 })
-                .Where(filter)
+                .Where(filter)                
                 .ToFeedIterator();
 
             if (!feedIterator.HasMoreResults)
@@ -44,13 +44,33 @@ namespace Quizzy.WebApp.DomainInfrastructure
 
             return count.Resource;
         }
-        
+                
+        public async Task<List<T>> FetchLimited<T, TKey>(Expression<Func<T, bool>> filter, Expression<Func<T, TKey>> orderByDesc, string partitionKey, int maxItems) where T : class
+        {
+            var container = m_CosmosClient.GetDatabase(_DATABASE_NAME)
+                                          .GetContainer(s_TypeContainers[typeof(T)]);
+
+            var feedIterator = container.GetItemLinqQueryable<T>(requestOptions: new QueryRequestOptions { PartitionKey = partitionKey.ToPartitionKey(), MaxItemCount = maxItems })
+                .Where(filter)          
+                .OrderByDescending(orderByDesc)
+                .Take(maxItems)
+                .ToFeedIterator();
+
+            if (!feedIterator.HasMoreResults)
+                return null;
+
+            var results = await feedIterator.ReadNextAsync();
+            return results.Resource.ToList();
+        }
+
+        #region SQL Queries
+
         public async Task<TValue> FetchSingle<TContainer, TValue>(QueryDefinition queryDefinition, string partitionKey)
         {
             var container = m_CosmosClient.GetDatabase(_DATABASE_NAME)
                                           .GetContainer(s_TypeContainers[typeof(TContainer)]);
 
-            using var feedIterator = container.GetItemQueryIterator<TValue>(queryDefinition, requestOptions: new QueryRequestOptions { PartitionKey = partitionKey.ToPartitionKey(), MaxItemCount = 1 });
+            using var feedIterator = container.GetItemQueryIterator<TValue>(queryDefinition, requestOptions: new QueryRequestOptions { PartitionKey = partitionKey.ToPartitionKey(), MaxItemCount = 2 });
 
             if (!feedIterator.HasMoreResults)
                 return default;
@@ -64,7 +84,7 @@ namespace Quizzy.WebApp.DomainInfrastructure
             var container = m_CosmosClient.GetDatabase(_DATABASE_NAME)
                                           .GetContainer(s_TypeContainers[typeof(TContainer)]);
 
-            using var feedIterator = container.GetItemQueryIterator<TValue>(queryDefinition, requestOptions: new QueryRequestOptions { PartitionKey = partitionKey.ToPartitionKey(), MaxItemCount = 1 });
+            using var feedIterator = container.GetItemQueryIterator<TValue>(queryDefinition, requestOptions: new QueryRequestOptions { PartitionKey = partitionKey.ToPartitionKey(), MaxItemCount = 25 });
 
             var results = new List<TValue>();
             while (feedIterator.HasMoreResults)
@@ -75,6 +95,25 @@ namespace Quizzy.WebApp.DomainInfrastructure
 
             return results;
         }
+        
+        public async Task<List<TValue>> Fetch<TContainer, TValue>(QueryDefinition queryDefinition, string partitionKey, int number)
+        {
+            var container = m_CosmosClient.GetDatabase(_DATABASE_NAME)
+                                          .GetContainer(s_TypeContainers[typeof(TContainer)]);
+
+            using var feedIterator = container.GetItemQueryIterator<TValue>(queryDefinition, requestOptions: new QueryRequestOptions { PartitionKey = partitionKey.ToPartitionKey(), MaxItemCount = number });
+
+            var results = new List<TValue>();
+            if (feedIterator.HasMoreResults)
+            {
+                var r = await feedIterator.ReadNextAsync();
+                results.AddRange(r);
+            }
+
+            return results;
+        }
+
+        #endregion
 
         private IOrderedQueryable<T> GetQueryable<T>(string partitionKey, int itemsPerPage = 20) where T : class
         {

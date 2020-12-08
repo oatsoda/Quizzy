@@ -4,6 +4,7 @@ using Quizzy.WebApp.Data.Entities;
 using Quizzy.WebApp.DomainInfrastructure;
 using Quizzy.WebApp.Errors;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,6 +23,7 @@ namespace Quizzy.WebApp.Features.Api.Competitions
             public Guid QuizId { get; set; }
 
             public ResultQuiz Quiz { get; set; }
+            public ResultOutcome Outcome { get; set; }
 
             public class ResultQuiz
             {
@@ -29,6 +31,20 @@ namespace Quizzy.WebApp.Features.Api.Competitions
                 public string Name { get; set; }
                 public string CreatorEmail { get; set; }
                 public string CreatorName { get; set; }
+            }
+
+            public class ResultOutcome
+            {
+                public ResultOutcomeLeader First { get; set; }
+                public ResultOutcomeLeader Second { get; set; }
+                public ResultOutcomeLeader Third { get; set; }
+                public int TotalQuestions { get; set; }
+            }
+
+            public class ResultOutcomeLeader
+            {
+                public string Name { get; set; }
+                public int CorrectAnswers { get; set; }
             }
         }
 
@@ -58,7 +74,25 @@ namespace Quizzy.WebApp.Features.Api.Competitions
                 var result = m_Mapper.Map<Result>(competition);
                 result.Quiz = m_Mapper.Map<Result.ResultQuiz>(quiz);
 
+                if (competition.Status == CompetitionStatus.Finished)
+                {
+                    var topParticipants = await GetTopParticipants(competition.Code);
+
+                    result.Outcome = new Result.ResultOutcome
+                    {
+                        TotalQuestions = quiz.Questions.Count,
+                        First = topParticipants.Count > 0 ? m_Mapper.Map<Result.ResultOutcomeLeader>(topParticipants[0]) : null,
+                        Second = topParticipants.Count > 1 ? m_Mapper.Map<Result.ResultOutcomeLeader>(topParticipants[1]) : null,
+                        Third = topParticipants.Count > 2 ? m_Mapper.Map<Result.ResultOutcomeLeader>(topParticipants[2]) : null                       
+                    };
+                }
+
                 return result;
+            }
+
+            private async Task<List<Participant>> GetTopParticipants(string competitionCode)
+            {
+                return await m_DataQuery.FetchLimited<Participant, int>(p => p.Discriminator == "Participant" && p.CompId == competitionCode, p => p.CorrectAnswers, competitionCode, 3);
             }
         }
     }
