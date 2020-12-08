@@ -21,7 +21,7 @@ export type QuizQuestion = {
   a2: string,
   a3: string,
   a4: string, 
-  correctA: AnswerNumber | null
+  correctA: AnswerNumber | 0
 }
 
 
@@ -41,6 +41,6 @@ export function createQuizQuestionNew() : QuizQuestion {
     a2: "",
     a3: "",
     a4: "",
-    correctA: null
+    correctA: 0
   };
 }

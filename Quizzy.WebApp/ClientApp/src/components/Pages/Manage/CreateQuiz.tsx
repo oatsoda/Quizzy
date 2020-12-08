@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom';
 import { Loader } from '../../General/Loader';
 import paths from '../../Config/paths';
 import { QuizInput } from './QuizInput';
+import { IValidationErrors } from '../../../api/validationTypes';
 
 export function CreateQuiz() {
 
@@ -14,13 +15,16 @@ export function CreateQuiz() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setError] = useState<string>();
+  const [validationErrors, setValidationErrors] = useState<IValidationErrors>();
 
   const saveNewQuiz = useCallback(async (newQuiz: QuizNew) => {
 
       setIsLoading(true);
+      setError(undefined);
+      setValidationErrors(undefined);
       console.log(newQuiz);
 
-      const quizCreated = await quizzesApi.postQuiz(newQuiz, (errMsg) => { setError(errMsg); });
+      const quizCreated = await quizzesApi.postQuiz(newQuiz, setError, setValidationErrors);
 
       if (quizCreated)
         history.push(paths.ManageQuiz(quizCreated.id));
@@ -34,7 +38,7 @@ export function CreateQuiz() {
     <Form>
       <Loader isLoading={isLoading} />
       <ErrorDisplay errorMessage={errorMessage} />
-      <QuizInput onSaveRequested={saveNewQuiz} />
+      <QuizInput validationErrors={validationErrors} disabled={false} onSaveRequested={saveNewQuiz} />
     </Form>
   );
 }

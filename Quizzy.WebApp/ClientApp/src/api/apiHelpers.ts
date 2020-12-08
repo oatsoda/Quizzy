@@ -39,9 +39,11 @@ export function getProblemDetails(response: ProcessedResponse) {
   let errors : IValidationErrors = {}
   for (let [propName, propErrors] of Object.entries( response.data.errors)) {
     propName = propName.charAt(0).toLowerCase() + propName.slice(1);
+    var pos = propName.indexOf('.');
+    if (pos >= 0)
+      propName = propName.slice(0, pos+1) + propName.charAt(pos+1).toLowerCase() + propName.slice(pos+2);
     errors[propName] = propErrors as string[];
   }
-
   return errors; 
 }
 
@@ -59,6 +61,7 @@ export function flattenApiError(response: ProcessedResponse) : string {
 export function handleError(response: ProcessedResponse, onError: (error: string) => void, onValidationError: (errors: IValidationErrors) => void) {
   if  (response.status === 400) {
     let err = getProblemDetails(response);
+    console.log(err);
     onValidationError(err);
   } else {
     onError(`Request failed: ${response.status}`);

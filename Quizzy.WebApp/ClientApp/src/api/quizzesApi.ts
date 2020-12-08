@@ -64,7 +64,7 @@ export class QuizzesApi {
                       });
   }
 
-  async postQuiz(quiz: QuizNew, onError: (error: string) => void) : Promise<Quiz | undefined> {
+  async postQuiz(quiz: QuizNew, onError: (error: string) => void, onValidationError: (errors: IValidationErrors) => void) : Promise<Quiz | undefined> {
 
     const url = `${apiBaseUrl}quizzes/`;
 
@@ -75,8 +75,23 @@ export class QuizzesApi {
                         return response.data;
                       }) 
                       .catch(error => {                        
-                        const errMsg = flattenApiError(error);
-                        onError(`Oops, something went wrong [${errMsg}]`);                        
+                        handleError(error, onError, onValidationError);                         
+                        return undefined;
+                      });
+  }
+
+  async putQuiz(id: string, quiz: QuizNew, onError: (error: string) => void, onValidationError: (errors: IValidationErrors) => void) : Promise<Quiz | undefined> {
+
+    const url = `${apiBaseUrl}quizzes/${id}`;
+
+    return await Axios.put<Quiz>(url, quiz, { validateStatus: _ => true })
+                      .then(processResponseAxios)
+                      .then(response => {
+                        // repsonses with status < 400 get resolved
+                        return response.data;
+                      }) 
+                      .catch(error => {                        
+                        handleError(error, onError, onValidationError);                         
                         return undefined;
                       });
   }
@@ -99,23 +114,6 @@ export class QuizzesApi {
                             const errMsg = flattenApiError(error)
                             onError(`Oops, something went wrong [${errMsg}]`);
                         }
-                        return undefined;
-                      });
-  }
-
-  async putQuiz(id: string, quiz: QuizNew, onError: (error: string) => void) : Promise<Quiz | undefined> {
-
-    const url = `${apiBaseUrl}quizzes/${id}`;
-
-    return await Axios.put<Quiz>(url, quiz, { validateStatus: _ => true })
-                      .then(processResponseAxios)
-                      .then(response => {
-                        // repsonses with status < 400 get resolved
-                        return response.data;
-                      }) 
-                      .catch(error => {                        
-                        const errMsg = flattenApiError(error);
-                        onError(`Oops, something went wrong [${errMsg}]`);                        
                         return undefined;
                       });
   }

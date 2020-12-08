@@ -1,11 +1,13 @@
 import React, { useCallback, useState } from 'react';
 import { Button, Col, FormGroup, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
 import { QuizNew, createQuizNew, QuizQuestion, createQuizQuestionNew } from '../../../api/quizTypes';
+import { hasPropError, IValidationErrors } from '../../../api/validationTypes';
+import { ParamError } from "../../General/ParamError";
 import { QuestionInput } from './QuestionInput';
 
 
-export function QuizInput(props: { quiz?: QuizNew; disabled: boolean, onSaveRequested: (quiz: QuizNew) => Promise<void>; }) {
-  const { onSaveRequested, disabled } = props;
+export function QuizInput(props: { quiz?: QuizNew; disabled: boolean, validationErrors?: IValidationErrors, onSaveRequested: (quiz: QuizNew) => Promise<void>; }) {
+  const { onSaveRequested, disabled, validationErrors } = props;
   const saveButtonCaption = props.quiz ? "Update Quiz" : "Create Quiz";
   const [newQuiz, setNewQuiz] = useState<QuizNew>(props.quiz ? props.quiz : createQuizNew());
   const [newQuizQuestions, setNewQuizQuestions] = useState<QuizQuestion[]>(props.quiz ? props.quiz.questions : [createQuizQuestionNew()]);
@@ -50,7 +52,8 @@ export function QuizInput(props: { quiz?: QuizNew; disabled: boolean, onSaveRequ
         <Col lg={6}>
           <FormGroup>
             <Label for="name">Quiz Name</Label>
-            <Input type="text" name="name" placeholder="Enter name" value={newQuiz.name} onChange={handleInputChange} disabled={disabled} />
+            <Input invalid={hasPropError(validationErrors, "name")} type="text" name="name" placeholder="Enter name" value={newQuiz.name} onChange={handleInputChange} disabled={disabled} />
+            <ParamError validationErrors={validationErrors} param="name" />
           </FormGroup>
         </Col>
       </Row>
@@ -58,7 +61,8 @@ export function QuizInput(props: { quiz?: QuizNew; disabled: boolean, onSaveRequ
         <Col lg={4}>
           <FormGroup>
             <Label for="creatorName">Your Name</Label>
-            <Input type="text" name="creatorName" placeholder="Enter your name" value={newQuiz.creatorName} onChange={handleInputChange} disabled={disabled} />
+            <Input invalid={hasPropError(validationErrors, "creatorName")} type="text" name="creatorName" placeholder="Enter your name" value={newQuiz.creatorName} onChange={handleInputChange} disabled={disabled} />
+            <ParamError validationErrors={validationErrors} param="creatorName" />
           </FormGroup>
         </Col>
         <Col>
@@ -68,13 +72,14 @@ export function QuizInput(props: { quiz?: QuizNew; disabled: boolean, onSaveRequ
               <InputGroupAddon addonType="prepend" id="emailprepend">
                 <InputGroupText>@</InputGroupText>
               </InputGroupAddon>
-              <Input type="email" name="creatorEmail" placeholder="Enter your email" value={newQuiz.creatorEmail} onChange={handleInputChange} disabled={disabled} />
+              <Input invalid={hasPropError(validationErrors, "creatorEmail")} type="email" name="creatorEmail" placeholder="Enter your email" value={newQuiz.creatorEmail} onChange={handleInputChange} disabled={disabled} />
+            <ParamError validationErrors={validationErrors} param="creatorEmail" />
             </InputGroup>
           </FormGroup>
         </Col>
       </Row>
       {newQuizQuestions.map((_, i) => (
-        <QuestionInput key={i} questionIndex={i} questions={newQuizQuestions} setQuestions={setNewQuizQuestions} onRemove={removeQuestion} disabled={disabled} />)
+        <QuestionInput key={i} questionIndex={i} questions={newQuizQuestions} setQuestions={setNewQuizQuestions} onRemove={removeQuestion} disabled={disabled} validationErrors={validationErrors} />)
       )}
       <FormGroup>
         <Button color="secondary" onClick={addQuestion} disabled={disabled}>Add Question</Button>

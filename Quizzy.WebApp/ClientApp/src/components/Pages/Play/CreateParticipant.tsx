@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Label, Input, Alert, InputGroupAddon, InputGroupText, InputGroup, FormFeedback } from 'reactstrap';
+import { Button, Form, FormGroup, Modal, ModalBody, ModalFooter, ModalHeader, Label, Input, Alert, InputGroupAddon, InputGroupText, InputGroup } from 'reactstrap';
 import { ErrorDisplay } from '../../General/ErrorDisplay';
 import { Loader } from '../../General/Loader';
 import { Competition } from '../../../api/competitionTypes';
 import { Participant, ParticipantNew, createParticipantNew } from '../../../api/participantTypes';
 import quizzesApi from '../../../api/quizzesApi';
 import { getStoredValue, storeValue } from '../../../storage/storageHelpers';
-import { IValidationErrors } from "../../../api/validationTypes";
+import { hasPropError, IValidationErrors } from "../../../api/validationTypes";
+import { ParamError } from '../../General/ParamError';
 
 const addPersonModalId: string = "personAddModal";
 
@@ -73,14 +74,14 @@ export function CreateParticipant(props: {
               <InputGroupAddon addonType="prepend" id="emailprepend">
                 <InputGroupText>@</InputGroupText>
               </InputGroupAddon>
-              <Input invalid={validationErrors && validationErrors["email"] ? true : false} type="email" name="email" placeholder="Enter email" aria-describedby="emailprepend" onChange={handleInputChange} value={newParticipant.email} />
-              { validationErrors && validationErrors["email"] && <FormFeedback>{validationErrors["email"][0]}</FormFeedback> }
+              <Input invalid={hasPropError(validationErrors, "email")} type="email" name="email" placeholder="Enter email" aria-describedby="emailprepend" onChange={handleInputChange} value={newParticipant.email} />
+              <ParamError validationErrors={validationErrors} param="email" />
             </InputGroup>
           </FormGroup> 
           <FormGroup>
             <Label for="name">Display name (as others will see it)</Label>
-            <Input invalid={validationErrors && validationErrors["name"] ? true : false} type="text" name="name" placeholder="Enter name" onChange={handleInputChange} value={newParticipant.name} />
-            { validationErrors && validationErrors["name"] && <FormFeedback>{validationErrors["name"][0]}</FormFeedback> }
+            <Input invalid={hasPropError(validationErrors, "name")} type="text" name="name" placeholder="Enter name" onChange={handleInputChange} value={newParticipant.name} />
+            <ParamError validationErrors={validationErrors} param="name" />
           </FormGroup>           
         </Form>
       </ModalBody>
@@ -92,3 +93,4 @@ export function CreateParticipant(props: {
     </>
   );
 }
+
