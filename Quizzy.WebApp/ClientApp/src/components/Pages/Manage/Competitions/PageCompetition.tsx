@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, Container } from 'reactstrap';
+import { Alert, Button, Container } from 'reactstrap';
 import { CompetitionOnly } from '../../../../api/competitionTypes';
 import quizzesApi from '../../../../api/quizzesApi';
 import { ErrorDisplay } from '../../../General/ErrorDisplay';
@@ -68,6 +68,15 @@ export function PageCompetition() {
         <ErrorDisplay errorMessage={errorMessage} />
         <h1>Competition {code}</h1>
         <h2>Status: {quizCompetition?.status}</h2>
+        <Alert color={quizCompetition?.status === "finished" ? "warning" : "info"}>{
+          quizCompetition?.status === "new"
+            ? "When you are ready for participants to register, Open the competition."
+            : quizCompetition?.status === "open"
+              ? "While the competition is in the Open status, your participants can register and connect if they have the Code.  Wait for all your participants to register and only choose Start once they are all ready for the first question."
+              : quizCompetition?.status === "started"
+                ? "The competition is Live. No new participants can register. Should any of the participants disconnect, they can still enter the Code to rejoin."
+                : "The competition has finished and results have been determined."
+        }</Alert>
         { quizCompetition && quizCompetition.status === "new" &&
           <Button onClick={handleOpen} color="primary">Open for participants to register</Button> }
         { quizCompetition && quizCompetition.status === "open" &&

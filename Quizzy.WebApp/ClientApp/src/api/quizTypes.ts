@@ -3,7 +3,8 @@ import { AnswerNumber } from "../components/Pages/Play/playTypes"
 export type Quiz = QuizNew & {
   id: string,
   competitionInfo: {
-    unfinishedCompetitionExists: boolean
+    unfinishedCompetitionExists: boolean,
+    unfinishedCompetitionCode: string | undefined
   }
 }
 

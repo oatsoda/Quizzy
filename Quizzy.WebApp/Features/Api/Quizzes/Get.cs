@@ -41,6 +41,7 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
             public class CompetitionInformation
             {
                 public bool UnfinishedCompetitionExists { get; set; }
+                public string UnfinishedCompetitionCode { get; set; }
             }
         }
 
@@ -66,8 +67,12 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
 
                 var result = m_Mapper.Map<Result>(quiz);
 
-                var unfinishedCompetitionExists = await m_UnfinishedCompetitionChecker.CheckForUnfinishedCompetitions(quiz.Id, false);
-                result.CompetitionInfo = new Result.CompetitionInformation { UnfinishedCompetitionExists = unfinishedCompetitionExists };
+                var unfinishedCompetitionCode = await m_UnfinishedCompetitionChecker.CheckForUnfinishedCompetitions(quiz.Id, false);
+                result.CompetitionInfo = new Result.CompetitionInformation 
+                    { 
+                        UnfinishedCompetitionExists = unfinishedCompetitionCode != null,
+                        UnfinishedCompetitionCode = unfinishedCompetitionCode
+                    };
 
                 return result;
             }
