@@ -40,9 +40,12 @@ export function LiveQuiz(props: { competition: Competition, participant: Partici
   useEffect(
     () => {
       if (playState.status === "finished" || competition.status === "finished")
+      {
+        hubConnection?.stop();
         history.push(`/quiz/${competition.code}/results/${participant.id}`);
+      }
     }, 
-    [competition.code, competition.status, history, participant.id, playState.status]
+    [competition.code, competition.status, history, participant.id, playState.status, hubConnection]
   );
 
   function delay(ms: number) {

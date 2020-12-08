@@ -28,7 +28,7 @@ export function JoinQuiz() {
       });
 
       if (competition?.status === "new")
-        setState({ buttonEnabled: true, loading: false, errorMessage: "This quiz has not yet started.  Try again once the organiser has started it." });
+        setState({ buttonEnabled: true, loading: false, errorMessage: "This competition isn't Open for registering yet. Try again once the organiser has Opened it." });
       else if (competition?.status === "finished")
         setState({ buttonEnabled: true, loading: false, errorMessage: "This quiz has finished." });
       else if (competition) 
