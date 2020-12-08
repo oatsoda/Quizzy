@@ -59,10 +59,10 @@ namespace Quizzy.WebApp.Features.Api.Competitions.Participants
                 // Fetch same participant if exists already (re-joining)
                 var participant = await m_DataQuery.FetchSingle<Participant>(p => p.Email == command.Email, command.CompetitionCode);
 
+                // Validate Status of Competition (can't join if already started and didn't already join)
                 if (participant == null && competition.Status != CompetitionStatus.Open)
                     throw new BadRequestException("Email", "Email was not registered before the quiz started. Once started, no new participants can join.");
 
-                // TODO: Validate Status of Competition (can't join if already started and didn't already join)
                 if (participant == null)
                     participant = new Participant(command.CompetitionCode, command.Email);
 

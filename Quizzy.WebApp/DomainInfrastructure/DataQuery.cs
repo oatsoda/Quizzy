@@ -17,7 +17,7 @@ namespace Quizzy.WebApp.DomainInfrastructure
             var container = m_CosmosClient.GetDatabase(_DATABASE_NAME)
                                           .GetContainer(s_TypeContainers[typeof(T)]);
 
-            var feedIterator = container.GetItemLinqQueryable<T>(requestOptions: new QueryRequestOptions { PartitionKey = partitionKey == null ? null : new PartitionKey(partitionKey), MaxItemCount = 2 })
+            var feedIterator = container.GetItemLinqQueryable<T>(requestOptions: new QueryRequestOptions { PartitionKey = partitionKey.ToPartitionKey(), MaxItemCount = 2 })
                 .Where(filter)
                 .ToFeedIterator();
 
@@ -38,7 +38,7 @@ namespace Quizzy.WebApp.DomainInfrastructure
             var container = m_CosmosClient.GetDatabase(_DATABASE_NAME)
                                           .GetContainer(s_TypeContainers[typeof(T)]);
 
-            var count = await container.GetItemLinqQueryable<T>(requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(partitionKey) })
+            var count = await container.GetItemLinqQueryable<T>(requestOptions: new QueryRequestOptions { PartitionKey = partitionKey.ToPartitionKey() })
                 .Where(filter)
                 .CountAsync();
 
@@ -50,7 +50,7 @@ namespace Quizzy.WebApp.DomainInfrastructure
             var container = m_CosmosClient.GetDatabase(_DATABASE_NAME)
                                           .GetContainer(s_TypeContainers[typeof(TContainer)]);
 
-            using var feedIterator = container.GetItemQueryIterator<TValue>(queryDefinition, requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(partitionKey), MaxItemCount = 1 });
+            using var feedIterator = container.GetItemQueryIterator<TValue>(queryDefinition, requestOptions: new QueryRequestOptions { PartitionKey = partitionKey.ToPartitionKey(), MaxItemCount = 1 });
 
             if (!feedIterator.HasMoreResults)
                 return default;
@@ -64,7 +64,7 @@ namespace Quizzy.WebApp.DomainInfrastructure
             var container = m_CosmosClient.GetDatabase(_DATABASE_NAME)
                                           .GetContainer(s_TypeContainers[typeof(TContainer)]);
 
-            using var feedIterator = container.GetItemQueryIterator<TValue>(queryDefinition, requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(partitionKey), MaxItemCount = 1 });
+            using var feedIterator = container.GetItemQueryIterator<TValue>(queryDefinition, requestOptions: new QueryRequestOptions { PartitionKey = partitionKey.ToPartitionKey(), MaxItemCount = 1 });
 
             var results = new List<TValue>();
             while (feedIterator.HasMoreResults)
@@ -81,7 +81,12 @@ namespace Quizzy.WebApp.DomainInfrastructure
             var container = m_CosmosClient.GetDatabase(_DATABASE_NAME)
                                           .GetContainer(s_TypeContainers[typeof(T)]);
 
-            return container.GetItemLinqQueryable<T>(requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(partitionKey), MaxItemCount = itemsPerPage });            
-        }
+            return container.GetItemLinqQueryable<T>(requestOptions: new QueryRequestOptions { PartitionKey = partitionKey.ToPartitionKey(), MaxItemCount = itemsPerPage });            
+        }        
+    }
+    
+    public static class StringExtensions
+    {
+        public static PartitionKey? ToPartitionKey(this string value) => value == null ? null : new PartitionKey(value);
     }
 }

@@ -3,6 +3,7 @@ using FluentValidation;
 using MediatR;
 using Quizzy.WebApp.Data.Entities;
 using Quizzy.WebApp.DomainInfrastructure;
+using Quizzy.WebApp.DomainServices;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -80,16 +81,20 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
         {
             private readonly DataStore m_DataStore;
             private readonly IMapper m_Mapper;
+            private readonly UnfinishedCompetitionChecker m_UnfinishedCompetitionChecker;
 
-            public Handler(DataStore dataStore, IMapper mapper)
+            public Handler(DataStore dataStore, IMapper mapper, UnfinishedCompetitionChecker unfinishedCompetitionChecker)
             {
                 m_DataStore = dataStore;
                 m_Mapper = mapper;
+                m_UnfinishedCompetitionChecker = unfinishedCompetitionChecker;
             }
 
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
             {
                 var quiz = await m_DataStore.Fetch<Quiz>(command.Id.ToString(), Quiz.CreatePartitionKeyFromId(command.Id));
+
+                await m_UnfinishedCompetitionChecker.CheckForUnfinishedCompetitions(command.Id);
 
                 quiz = m_Mapper.Map(command, quiz);
 

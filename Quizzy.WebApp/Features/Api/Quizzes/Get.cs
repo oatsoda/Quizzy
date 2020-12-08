@@ -2,6 +2,7 @@
 using MediatR;
 using Quizzy.WebApp.Data.Entities;
 using Quizzy.WebApp.DomainInfrastructure;
+using Quizzy.WebApp.DomainServices;
 using Quizzy.WebApp.Errors;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,8 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
 
             public List<Question> Questions { get; set; }
 
+            public CompetitionInformation CompetitionInfo { get; set; }
+
             public class Question
             {
                 public string Q { get; set; }
@@ -34,17 +37,24 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
                 public string A4 { get; set; }
                 public int CorrectA { get; set; }
             }
+
+            public class CompetitionInformation
+            {
+                public bool UnfinishedCompetitionExists { get; set; }
+            }
         }
 
         public class Handler : IRequestHandler<Query, Result>
         {
             private readonly DataQuery m_DataQuery;
             private readonly IMapper m_Mapper;
+            private readonly UnfinishedCompetitionChecker m_UnfinishedCompetitionChecker;
 
-            public Handler(DataQuery dataQuery, IMapper mapper)
+            public Handler(DataQuery dataQuery, IMapper mapper, UnfinishedCompetitionChecker unfinishedCompetitionChecker)
             {
                 m_DataQuery = dataQuery;
                 m_Mapper = mapper;
+                m_UnfinishedCompetitionChecker = unfinishedCompetitionChecker;
             }
 
             public async Task<Result> Handle(Query query, CancellationToken cancellationToken)
@@ -54,7 +64,12 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
                 if (quiz == null)
                     throw new ResourceNotFoundException("Quiz", nameof(Query.Id), query.Id.ToString());                
 
-                return m_Mapper.Map<Result>(quiz);
+                var result = m_Mapper.Map<Result>(quiz);
+
+                var unfinishedCompetitionExists = await m_UnfinishedCompetitionChecker.CheckForUnfinishedCompetitions(quiz.Id, false);
+                result.CompetitionInfo = new Result.CompetitionInformation { UnfinishedCompetitionExists = unfinishedCompetitionExists };
+
+                return result;
             }
         }
     }

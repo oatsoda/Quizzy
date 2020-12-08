@@ -63,6 +63,7 @@ namespace Quizzy.WebApp
 
             services.AddSingleton<DataQuery>();
             services.AddSingleton<DataStore>();
+            services.AddSingleton<UnfinishedCompetitionChecker>();
             services.AddSingleton<CompetitionCodeGenerator>();
             services.AddSingleton<RandomCodeGenerator>();
             services.AddSingleton<ParticipantNotifier>();

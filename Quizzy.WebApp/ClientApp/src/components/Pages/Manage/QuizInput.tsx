@@ -4,8 +4,8 @@ import { QuizNew, createQuizNew, QuizQuestion, createQuizQuestionNew } from '../
 import { QuestionInput } from './QuestionInput';
 
 
-export function QuizInput(props: { quiz?: QuizNew; onSaveRequested: (quiz: QuizNew) => Promise<void>; }) {
-  const { onSaveRequested } = props;
+export function QuizInput(props: { quiz?: QuizNew; disabled: boolean, onSaveRequested: (quiz: QuizNew) => Promise<void>; }) {
+  const { onSaveRequested, disabled } = props;
   const saveButtonCaption = props.quiz ? "Update Quiz" : "Create Quiz";
   const [newQuiz, setNewQuiz] = useState<QuizNew>(props.quiz ? props.quiz : createQuizNew());
   const [newQuizQuestions, setNewQuizQuestions] = useState<QuizQuestion[]>(props.quiz ? props.quiz.questions : [createQuizQuestionNew()]);
@@ -50,7 +50,7 @@ export function QuizInput(props: { quiz?: QuizNew; onSaveRequested: (quiz: QuizN
         <Col lg={6}>
           <FormGroup>
             <Label for="name">Quiz Name</Label>
-            <Input type="text" name="name" placeholder="Enter name" value={newQuiz.name} onChange={handleInputChange} />
+            <Input type="text" name="name" placeholder="Enter name" value={newQuiz.name} onChange={handleInputChange} disabled={disabled} />
           </FormGroup>
         </Col>
       </Row>
@@ -58,7 +58,7 @@ export function QuizInput(props: { quiz?: QuizNew; onSaveRequested: (quiz: QuizN
         <Col lg={4}>
           <FormGroup>
             <Label for="creatorName">Your Name</Label>
-            <Input type="text" name="creatorName" placeholder="Enter your name" value={newQuiz.creatorName} onChange={handleInputChange} />
+            <Input type="text" name="creatorName" placeholder="Enter your name" value={newQuiz.creatorName} onChange={handleInputChange} disabled={disabled} />
           </FormGroup>
         </Col>
         <Col>
@@ -68,19 +68,19 @@ export function QuizInput(props: { quiz?: QuizNew; onSaveRequested: (quiz: QuizN
               <InputGroupAddon addonType="prepend" id="emailprepend">
                 <InputGroupText>@</InputGroupText>
               </InputGroupAddon>
-              <Input type="email" name="creatorEmail" placeholder="Enter your email" value={newQuiz.creatorEmail} onChange={handleInputChange} />
+              <Input type="email" name="creatorEmail" placeholder="Enter your email" value={newQuiz.creatorEmail} onChange={handleInputChange} disabled={disabled} />
             </InputGroup>
           </FormGroup>
         </Col>
       </Row>
       {newQuizQuestions.map((_, i) => (
-        <QuestionInput key={i} questionIndex={i} questions={newQuizQuestions} setQuestions={setNewQuizQuestions} onRemove={removeQuestion} />)
+        <QuestionInput key={i} questionIndex={i} questions={newQuizQuestions} setQuestions={setNewQuizQuestions} onRemove={removeQuestion} disabled={disabled} />)
       )}
       <FormGroup>
-        <Button color="secondary" onClick={addQuestion}>Add Question</Button>
+        <Button color="secondary" onClick={addQuestion} disabled={disabled}>Add Question</Button>
       </FormGroup>
       <FormGroup>
-        <Button color="primary" onClick={onSave}>{saveButtonCaption}</Button>
+        <Button color="primary" onClick={onSave} disabled={disabled}>{saveButtonCaption}</Button>
       </FormGroup>
     </>
   );

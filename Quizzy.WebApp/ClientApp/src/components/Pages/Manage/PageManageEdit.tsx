@@ -50,7 +50,6 @@ export function PageManageEdit() {
   );
 
   // TODO: Probably need a way to list all competitions?  Depends whether it's going to just email links rather than have a "manage" page.
-  // TODO: Probably need to prevent editing when there is a competition open
   
   return (
     <>
@@ -62,7 +61,7 @@ export function PageManageEdit() {
 
         <h3 className="mb-2">Manage competitions</h3>
         <div className="border rounded p-3 mb-3">
-          <Button onClick={handleButtonClick} color="primary">Create a code</Button>
+          <Button onClick={handleButtonClick} color="primary" disabled={quiz?.competitionInfo.unfinishedCompetitionExists}>Create a code</Button>
         </div>     
 
         <h3 className="mb-3">Update quiz</h3>

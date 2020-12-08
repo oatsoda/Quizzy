@@ -37,13 +37,15 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
             private readonly DataQuery m_DataQuery;
             private readonly IMapper m_Mapper;
             private readonly CompetitionCodeGenerator m_CompetitionCodeGenerator;
+            private readonly UnfinishedCompetitionChecker m_UnfinishedCompetitionChecker;
 
-            public Handler(DataStore dataStore, DataQuery dataQuery, IMapper mapper, CompetitionCodeGenerator competitionCodeGenerator)
+            public Handler(DataStore dataStore, DataQuery dataQuery, IMapper mapper, CompetitionCodeGenerator competitionCodeGenerator, UnfinishedCompetitionChecker unfinishedCompetitionChecker)
             {
                 m_DataStore = dataStore;
                 m_DataQuery = dataQuery;
                 m_Mapper = mapper;
                 m_CompetitionCodeGenerator = competitionCodeGenerator;
+                m_UnfinishedCompetitionChecker = unfinishedCompetitionChecker;
             }
 
             public async Task<Result> Handle(Command command, CancellationToken cancellationToken)
@@ -51,6 +53,8 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
                 // Validate QuizId
                 if (!await m_DataQuery.Exists<Quiz>(q => q.Id == command.QuizId, Quiz.CreatePartitionKeyFromId(command.QuizId)))
                     throw new ResourceNotFoundException("Quiz", "Id", command.QuizId.ToString());
+
+                await m_UnfinishedCompetitionChecker.CheckForUnfinishedCompetitions(command.QuizId);
 
                 var competition = await Task.Run(() => new Competition(command.QuizId, m_CompetitionCodeGenerator));
                 competition = m_Mapper.Map(command, competition);

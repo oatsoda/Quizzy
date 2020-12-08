@@ -1,7 +1,10 @@
 import { AnswerNumber } from "../components/Pages/Play/playTypes"
 
 export type Quiz = QuizNew & {
-  id: string
+  id: string,
+  competitionInfo: {
+    unfinishedCompetitionExists: boolean
+  }
 }
 
 export type QuizNew = {

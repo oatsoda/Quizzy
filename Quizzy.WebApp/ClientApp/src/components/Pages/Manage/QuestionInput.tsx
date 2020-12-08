@@ -3,8 +3,8 @@ import { Button, Col, CustomInput, FormGroup, Input, InputGroup, InputGroupAddon
 import { QuizQuestion } from '../../../api/quizTypes';
 
 
-export function QuestionInput(props: { questionIndex: number; questions: QuizQuestion[]; setQuestions: Dispatch<SetStateAction<QuizQuestion[]>>; onRemove: (i: number) => void; }) {
-  const { questionIndex, questions, setQuestions, onRemove } = props;
+export function QuestionInput(props: { disabled: boolean, questionIndex: number; questions: QuizQuestion[]; setQuestions: Dispatch<SetStateAction<QuizQuestion[]>>; onRemove: (i: number) => void; }) {
+  const { disabled, questionIndex, questions, setQuestions, onRemove } = props;
   const [question, setQuestion] = useState(questions[questionIndex]);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export function QuestionInput(props: { questionIndex: number; questions: QuizQue
         <Col>
           <FormGroup>
             <Label for="q" className="font-weight-bold">Question {questionIndex + 1}</Label>
-            <Input type="text" name="q" value={question.q} placeholder="Question" onChange={handleInputChange} />
+            <Input type="text" name="q" value={question.q} placeholder="Question" onChange={handleInputChange} disabled={disabled} />
           </FormGroup>
         </Col>
       </Row>
@@ -61,7 +61,7 @@ export function QuestionInput(props: { questionIndex: number; questions: QuizQue
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>A</InputGroupText>
               </InputGroupAddon>
-              <Input type="text" name="a1" value={question.a1} placeholder="Answer 1" onChange={handleInputChange} className="A" />
+              <Input type="text" name="a1" value={question.a1} placeholder="Answer 1" onChange={handleInputChange} className="A" disabled={disabled} />
             </InputGroup>
           </Col>
           <Col lg={6}>
@@ -69,7 +69,7 @@ export function QuestionInput(props: { questionIndex: number; questions: QuizQue
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>B</InputGroupText>
               </InputGroupAddon>
-              <Input type="text" name="a2" value={question.a2} placeholder="Answer 2" onChange={handleInputChange} className="B" />
+              <Input type="text" name="a2" value={question.a2} placeholder="Answer 2" onChange={handleInputChange} className="B" disabled={disabled} />
             </InputGroup>
           </Col>
         </Row>
@@ -79,7 +79,7 @@ export function QuestionInput(props: { questionIndex: number; questions: QuizQue
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>C</InputGroupText>
               </InputGroupAddon>
-              <Input type="text" name="a3" value={question.a3} placeholder="Answer 3" onChange={handleInputChange} className="C" />
+              <Input type="text" name="a3" value={question.a3} placeholder="Answer 3" onChange={handleInputChange} className="C" disabled={disabled} />
             </InputGroup>
           </Col>
           <Col lg={6}>
@@ -87,19 +87,19 @@ export function QuestionInput(props: { questionIndex: number; questions: QuizQue
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>D</InputGroupText>
               </InputGroupAddon>
-              <Input type="text" name="a4" value={question.a4} placeholder="Answer 4" onChange={handleInputChange} className="D" />
+              <Input type="text" name="a4" value={question.a4} placeholder="Answer 4" onChange={handleInputChange} className="D" disabled={disabled} />
             </InputGroup>
           </Col>
         </Row>
         <Row form>
           <Col lg={4}>
-            <CustomInput type="select" name="correctA" id="correctA" value={question.correctA ?? ""} onChange={handleInputChange}>
-              <option value="">Select Correct Answer</option>
+            <CustomInput type="select" name="correctA" id="correctA" value={question.correctA ?? 0} onChange={handleInputChange} disabled={disabled}>
+              <option value={0}>Select Correct Answer</option>
               { [1,2,3,4].map(n => <option key={n} value={n}>{answerDisplay(n)}</option>) }
             </CustomInput>
           </Col>
           {questionIndex > 0 &&
-            <Col><Button color="link" onClick={() => onRemove(questionIndex)}>Delete Question</Button></Col>}
+            <Col><Button color="link" onClick={() => onRemove(questionIndex)} disabled={disabled}>Delete Question</Button></Col>}
         </Row>
       </div>
     </>
