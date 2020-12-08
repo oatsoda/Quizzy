@@ -82,7 +82,7 @@ export function PageManageEdit() {
         <h3 className="mb-2">Manage competitions</h3>
         <div className="border rounded p-3 mb-3">
           { createdCompetitionOk && <Alert color="success">Competition Created Successfully</Alert> }
-          <Button onClick={handleButtonClick} color="primary" disabled={quiz?.competitionInfo.unfinishedCompetitionExists}>Create a code</Button>
+          <Button onClick={handleButtonClick} color="primary" disabled={quiz?.competitionInfo.unfinishedCompetitionExists}>Create a Competition Code</Button>
           { quiz?.competitionInfo.unfinishedCompetitionCode && 
             <Button onClick={handleNavButtonClick} color="primary" className="ml-3">Manage Competition</Button>
           }
