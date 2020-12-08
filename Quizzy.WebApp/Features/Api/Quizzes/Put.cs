@@ -6,6 +6,7 @@ using Quizzy.WebApp.DomainInfrastructure;
 using Quizzy.WebApp.DomainServices;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,15 +62,38 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
                     .NotEmpty();                
                 RuleFor(q => q.A1)
                     .NotEmpty()
-                    ;// TODO: Check unique answers e.g. .Must((q, a1) => a1 != q.A2 ...).WithMessage(...);                
+                    .Must((q, a1) => BeUnique(q, a1, 1)).WithMessage("Answer must be unique");          
                 RuleFor(q => q.A2)
-                    .NotEmpty();                
+                    .NotEmpty()
+                    .Must((q, a2) => BeUnique(q, a2, 2)).WithMessage("Answer must be unique");                  
                 RuleFor(q => q.A3)
-                    .NotEmpty();                
+                    .NotEmpty()
+                    .Must((q, a3) => BeUnique(q, a3, 3)).WithMessage("Answer must be unique");                  
                 RuleFor(q => q.A4)
-                    .NotEmpty();                
+                    .NotEmpty()
+                    .Must((q, a4) => BeUnique(q, a4, 4)).WithMessage("Answer must be unique");                   
                 RuleFor(q => q.CorrectA)
                     .InclusiveBetween(1, 4);
+            }
+
+            private bool BeUnique(Command.Question q, string thisA, int answerNo)
+            {
+                var a = thisA.ToLowerInvariant();
+                return !GetAnswersExcept(q, answerNo).Contains(a);
+            }
+
+            private IEnumerable<string> GetAnswersExcept(Command.Question q, int answerNo)
+            {
+                if (answerNo == 1)
+                    return new [] { q.A2, q.A3, q.A4 }.Select(a => a.ToLowerInvariant());                
+                if (answerNo == 2)
+                    return new [] { q.A1, q.A3, q.A4 }.Select(a => a.ToLowerInvariant());                
+                if (answerNo == 3)
+                    return new [] { q.A1, q.A2, q.A4 }.Select(a => a.ToLowerInvariant());                
+                if (answerNo == 4)
+                    return new [] { q.A1, q.A2, q.A3 }.Select(a => a.ToLowerInvariant());
+
+                throw new ArgumentOutOfRangeException(nameof(answerNo), "AnswerNo must be 1-4");
             }
         }
 

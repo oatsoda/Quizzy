@@ -23,7 +23,7 @@ namespace Quizzy.WebApp.DomainServices
             if (unfinishedComp != null && throwBadRequest)
                 throw new BadRequestException("QuizId", "There is already a competition running for this quiz. You can only have a single competition running at a time.");
 
-            return unfinishedComp.Code;
+            return unfinishedComp?.Code;
         }
     }
 }
