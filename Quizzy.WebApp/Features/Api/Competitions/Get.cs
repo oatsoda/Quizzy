@@ -76,6 +76,7 @@ namespace Quizzy.WebApp.Features.Api.Competitions
 
                 if (competition.Status == CompetitionStatus.Finished)
                 {
+                    // TODO: How to solve tie-breakers / same scores?
                     var topParticipants = await GetTopParticipants(competition.Code);
 
                     result.Outcome = new Result.ResultOutcome
