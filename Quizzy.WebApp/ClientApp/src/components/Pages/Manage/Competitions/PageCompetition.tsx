@@ -26,7 +26,7 @@ export function PageCompetition() {
   async function loadQuizCompetition(i: string, c: string) : Promise<void> {
 
     setIsLoading(true);
-    const quizComp = await quizzesApi.getQuizCompetition(i, c, (errMsg) => {setError(errMsg)});
+    const quizComp = await quizzesApi.getQuizCompetition(i, c, setError);
     if (quizComp)
       setQuizCompetition(quizComp);    
     setIsLoading(false);
@@ -34,7 +34,7 @@ export function PageCompetition() {
 
   const updateCompetitionStatus = useCallback(async (status: "open" | "start") => {
       setIsLoading(true);
-      const success = await quizzesApi.postQuizCompetitionStatusChange(id, code, status, (errMsg) => { setError(errMsg); });
+      const success = await quizzesApi.postQuizCompetitionStatusChange(id, code, status, setError);
 
       if (success)
         setQuizCompetition(prev => ({
@@ -63,11 +63,11 @@ export function PageCompetition() {
   return (
     <>
       <MenuBar />
-      <Loader isLoading={isLoading} />
       <Container>
-        <ErrorDisplay errorMessage={errorMessage} />
         <h1>Competition {code}</h1>
         <h2>Status: {quizCompetition?.status}</h2>
+        <Loader isLoading={isLoading} />
+        <ErrorDisplay errorMessage={errorMessage} />
         <Alert color={quizCompetition?.status === "finished" ? "warning" : "info"}>{
           quizCompetition?.status === "new"
             ? "When you are ready for participants to register, Open the competition."

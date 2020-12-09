@@ -29,11 +29,13 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
         {
             private readonly DataStore m_DataStore;
             private readonly LiveQuizzes m_LiveQuizzes;
+            private readonly DataQuery m_DataQuery;
 
-            public Handler(DataStore dataStore, LiveQuizzes liveQuizzes)
+            public Handler(DataStore dataStore, LiveQuizzes liveQuizzes, DataQuery dataQuery)
             {
                 m_DataStore = dataStore;
                 m_LiveQuizzes = liveQuizzes;
+                m_DataQuery = dataQuery;
             }
 
             protected override async Task Handle(Command command, CancellationToken cancellationToken)
@@ -45,6 +47,10 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
                                 
                 if (competition.QuizId != command.QuizId)
                     throw new ResourceNotFoundException("Competition", "QuizId", command.QuizId.ToString());
+
+                var participants = await m_DataQuery.Count<Participant>(p => p.CompId == competition.Code && p.Discriminator == Participant.DiscriminatorValue, competition.Code);
+                if (participants == 0)
+                    throw new BadRequestException("Code", "The competition hasn't got any participants yet. You cannot start it until participants have registered");
 
                 competition.Start();
                 await m_DataStore.Update(competition, competition.Code, competition.Code);
