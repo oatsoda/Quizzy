@@ -146,12 +146,11 @@ namespace Quizzy.WebApp.QuizProcess
 
         private async Task<bool> AllAnswered()
         {
-            // TODO: Why is quNo param not working (Due to double quotes?)
             // TODO: Filtering by connected, but probably remove and have a max time limit.
-            var query = new QueryDefinition($"SELECT VALUE COUNT(c) FROM c WHERE c.CompId = @code AND c.Discriminator = @disc AND c.IsConnected = true AND NOT IS_DEFINED(c.Answers[\"{CurrentQuestion}\"])")
+            var query = new QueryDefinition($"SELECT VALUE COUNT(c) FROM c WHERE c.CompId = @code AND c.Discriminator = @disc AND c.IsConnected = true AND NOT IS_DEFINED(c.Answers[@quNo])")
                 .WithParameter("@code", m_Competition.Code)
                 .WithParameter("@disc", Participant.DiscriminatorValue)
-                .WithParameter("@quNo", CurrentQuestion);
+                .WithParameter("@quNo", CurrentQuestion.ToString()); // Have to ToString it as c.Answers[@quNo] requires string
 
             var notAnsweredCount = await m_DataQuery.FetchSingle<Participant, int>(query, m_Competition.Code);
             return notAnsweredCount == 0;
@@ -159,11 +158,10 @@ namespace Quizzy.WebApp.QuizProcess
 
         private async Task<List<LiveParticipant>> GetParticipants()
         {
-            // TODO: Why is quNo param not working (Due to double quotes?)
-            var query = new QueryDefinition($"SELECT c.id, c.Name, IS_DEFINED(c.Answers[\"{CurrentQuestion}\"]) AS answeredCurrent, c.IsConnected FROM c WHERE c.CompId = @code and c.Discriminator = @disc")
+            var query = new QueryDefinition($"SELECT c.id, c.Name, IS_DEFINED(c.Answers[@quNo]) AS answeredCurrent, c.IsConnected FROM c WHERE c.CompId = @code and c.Discriminator = @disc")
                 .WithParameter("@code", m_Competition.Code)
                 .WithParameter("@disc", Participant.DiscriminatorValue)
-                .WithParameter("@quNo", CurrentQuestion);
+                .WithParameter("@quNo", CurrentQuestion.ToString()); // Have to ToString it as c.Answers[@quNo] requires string
                         
             return await m_DataQuery.FetchAll<Participant, LiveParticipant>(query, m_Competition.Code);
         }

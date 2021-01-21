@@ -60,12 +60,12 @@ export function QuestionInput(props: { disabled: boolean, validationErrors?: IVa
       </Row>
       <div className="pl-3 mb-3 border-left">
         <Row form className="mb-1">
-          <Col lg={6}>
+          <Col lg={6} className="mb-lg-0 mb-1">
             <InputGroup>
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>A</InputGroupText>
               </InputGroupAddon>
-              <Input invalid={hasPropError(validationErrors, `${parentTypeName}[${questionIndex}].a1`)} type="text" name="a1" value={question.a1} placeholder="Answer 1" onChange={handleInputChange} className="A" disabled={disabled} />
+              <Input invalid={hasPropError(validationErrors, `${parentTypeName}[${questionIndex}].a1`)} type="text" name="a1" value={question.a1} placeholder="Answer A" onChange={handleInputChange} className="A" disabled={disabled} />
               <ParamError validationErrors={validationErrors} param={`${parentTypeName}[${questionIndex}].a1`} />
             </InputGroup>
           </Col>
@@ -74,18 +74,18 @@ export function QuestionInput(props: { disabled: boolean, validationErrors?: IVa
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>B</InputGroupText>
               </InputGroupAddon>
-              <Input invalid={hasPropError(validationErrors, `${parentTypeName}[${questionIndex}].a2`)} type="text" name="a2" value={question.a2} placeholder="Answer 2" onChange={handleInputChange} className="B" disabled={disabled} />
+              <Input invalid={hasPropError(validationErrors, `${parentTypeName}[${questionIndex}].a2`)} type="text" name="a2" value={question.a2} placeholder="Answer B" onChange={handleInputChange} className="B" disabled={disabled} />
               <ParamError validationErrors={validationErrors} param={`${parentTypeName}[${questionIndex}].a2`} />
             </InputGroup>
           </Col>
         </Row>
         <Row form className="mb-1">
-          <Col lg={6}>
+          <Col lg={6} className="mb-lg-0 mb-1">
             <InputGroup>
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>C</InputGroupText>
               </InputGroupAddon>
-              <Input invalid={hasPropError(validationErrors, `${parentTypeName}[${questionIndex}].a3`)} type="text" name="a3" value={question.a3} placeholder="Answer 3" onChange={handleInputChange} className="C" disabled={disabled} />
+              <Input invalid={hasPropError(validationErrors, `${parentTypeName}[${questionIndex}].a3`)} type="text" name="a3" value={question.a3} placeholder="Answer C" onChange={handleInputChange} className="C" disabled={disabled} />
               <ParamError validationErrors={validationErrors} param={`${parentTypeName}[${questionIndex}].a3`} />
             </InputGroup>
           </Col>
@@ -94,7 +94,7 @@ export function QuestionInput(props: { disabled: boolean, validationErrors?: IVa
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>D</InputGroupText>
               </InputGroupAddon>
-              <Input invalid={hasPropError(validationErrors, `${parentTypeName}[${questionIndex}].a4`)} type="text" name="a4" value={question.a4} placeholder="Answer 4" onChange={handleInputChange} className="D" disabled={disabled} />
+              <Input invalid={hasPropError(validationErrors, `${parentTypeName}[${questionIndex}].a4`)} type="text" name="a4" value={question.a4} placeholder="Answer D" onChange={handleInputChange} className="D" disabled={disabled} />
               <ParamError validationErrors={validationErrors} param={`${parentTypeName}[${questionIndex}].a4`} />
             </InputGroup>
           </Col>
