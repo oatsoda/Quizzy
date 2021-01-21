@@ -14,7 +14,14 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
     {
         public class Command : IRequest
         {
-            public Guid QuizId { get; set; }
+            /// <summary>
+            /// The unique identifier for the Quiz.
+            /// </summary>
+            public Guid QuizId { get; set; }            
+                       
+            /// <summary>
+            /// The unique code for the Competition.
+            /// </summary>
             public string Code { get; set; }
         }
 

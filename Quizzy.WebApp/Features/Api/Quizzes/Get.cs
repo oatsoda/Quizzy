@@ -15,6 +15,9 @@ namespace Quizzy.WebApp.Features.Api.Quizzes
     {
         public class Query : IRequest<Result>
         {
+            /// <summary>
+            /// The unique identifier for the Quiz.
+            /// </summary>
             public Guid Id { get; set; }
         }
 

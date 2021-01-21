@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Quizzy.WebApp</name>
+    </assembly>
+    <members>
+        <member name="M:Quizzy.WebApp.Features.Api.Competitions.CompetitionsController.Get(Quizzy.WebApp.Features.Api.Competitions.Get.Query)">
+            <summary>
+            Gets a Competition to play.
+            </summary>
+        </member>
+        <member name="P:Quizzy.WebApp.Features.Api.Competitions.Get.Query.Code">
+            <summary>
+            The unique code for the Competition.
+            </summary>
+        </member>
+        <member name="M:Quizzy.WebApp.Features.Api.Competitions.Participants.ParticipantsController.Put(System.String,Quizzy.WebApp.Features.Api.Competitions.Participants.Put.Command)">
+            <summary>
+            Creates or Updates a Participant of a Competition.
+            </summary>
+        </member>
+        <member name="P:Quizzy.WebApp.Features.Api.Competitions.Participants.Put.Command.CompetitionCode">
+            <summary>
+            The unique code for the Competition.
+            </summary>
+        </member>
+        <member name="P:Quizzy.WebApp.Features.Api.Competitions.Participants.Put.Command.Name">
+            <summary>
+            The participant's name.
+            </summary>
+        </member>
+        <member name="P:Quizzy.WebApp.Features.Api.Competitions.Participants.Put.Command.Email">
+            <summary>
+            The participant's email. If already exists, the participant will be updated instead of created.
+            </summary>
+        </member>
+        <member name="P:Quizzy.WebApp.Features.Api.Competitions.Participants.Results.Get.Query.Code">
+            <summary>
+            The unique code for the Competition.
+            </summary>
+        </member>
+        <member name="P:Quizzy.WebApp.Features.Api.Competitions.Participants.Results.Get.Query.ParticipantId">
+            <summary>
+            The unique identifier for the Participant of the Competition.
+            </summary>
+        </member>
+        <member name="M:Quizzy.WebApp.Features.Api.Competitions.Participants.Results.ResultsController.Get(Quizzy.WebApp.Features.Api.Competitions.Participants.Results.Get.Query)">
+            <summary>
+            Gets the results for a participant of a competition.
+            </summary>
+        </member>
+        <member name="M:Quizzy.WebApp.Features.Api.Quizzes.Competitions.CompetitionsController.Get(Quizzy.WebApp.Features.Api.Quizzes.Competitions.Get.Query)">
+            <summary>
+            Gets a Competition for a Quiz.
+            </summary>
+        </member>
+        <member name="M:Quizzy.WebApp.Features.Api.Quizzes.Competitions.CompetitionsController.Post(System.Guid,Quizzy.WebApp.Features.Api.Quizzes.Competitions.Post.Command)">
+            <summary>
+            Creates a new Competition for a Quiz.
+            </summary>
+        </member>
+        <member name="P:Quizzy.WebApp.Features.Api.Quizzes.Competitions.Get.Query.QuizId">
+            <summary>
+            The unique identifier for the Quiz.
+            </summary>
+        </member>
+        <member name="P:Quizzy.WebApp.Features.Api.Quizzes.Competitions.Get.Query.Code">
+            <summary>
+            The unique code for the Competition.
+            </summary>
+        </member>
+        <member name="P:Quizzy.WebApp.Features.Api.Quizzes.Competitions.Open.Command.QuizId">
+            <summary>
+            The unique identifier for the Quiz.
+            </summary>
+        </member>
+        <member name="P:Quizzy.WebApp.Features.Api.Quizzes.Competitions.Open.Command.Code">
+            <summary>
+            The unique code for the Competition.
+            </summary>
+        </member>
+        <member name="P:Quizzy.WebApp.Features.Api.Quizzes.Competitions.Start.Command.QuizId">
+            <summary>
+            The unique identifier for the Quiz.
+            </summary>
+        </member>
+        <member name="P:Quizzy.WebApp.Features.Api.Quizzes.Competitions.Start.Command.Code">
+            <summary>
+            The unique code for the Competition.
+            </summary>
+        </member>
+        <member name="M:Quizzy.WebApp.Features.Api.Quizzes.Competitions.Status.StatusController.Open(Quizzy.WebApp.Features.Api.Quizzes.Competitions.Open.Command)">
+            <summary>
+            Opens a Competition to allow Participants to join.
+            </summary>
+        </member>
+        <member name="M:Quizzy.WebApp.Features.Api.Quizzes.Competitions.Status.StatusController.Start(Quizzy.WebApp.Features.Api.Quizzes.Competitions.Start.Command)">
+            <summary>
+            Starts a Competition.
+            </summary>
+        </member>
+        <member name="P:Quizzy.WebApp.Features.Api.Quizzes.Get.Query.Id">
+            <summary>
+            The unique identifier for the Quiz.
+            </summary>
+        </member>
+        <member name="M:Quizzy.WebApp.Features.Api.Quizzes.QuizzesController.Get(Quizzy.WebApp.Features.Api.Quizzes.Get.Query)">
+            <summary>
+            Gets a Quiz.
+            </summary>
+        </member>
+        <member name="M:Quizzy.WebApp.Features.Api.Quizzes.QuizzesController.Post(Quizzy.WebApp.Features.Api.Quizzes.Post.Command)">
+            <summary>
+            Creates a new Quiz.
+            </summary>
+        </member>
+        <member name="M:Quizzy.WebApp.Features.Api.Quizzes.QuizzesController.Put(System.Guid,Quizzy.WebApp.Features.Api.Quizzes.Put.Command)">
+            <summary>
+            Updates a Quiz.
+            </summary>
+        </member>
+        <member name="T:Quizzy.WebApp.QuizProcess.IClientMessages">
+            <summary>
+            Messages that can be sent To Client.
+            </summary>
+        </member>
+    </members>
+</doc>

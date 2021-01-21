@@ -14,8 +14,19 @@ namespace Quizzy.WebApp.Features.Api.Competitions.Participants
     {
         public class Command : IRequest<Result>
         {
+            /// <summary>
+            /// The unique code for the Competition.
+            /// </summary>
             public string CompetitionCode { get; set; }
+            
+            /// <summary>
+            /// The participant's name.
+            /// </summary>
             public string Name { get; set; }
+
+            /// <summary>
+            /// The participant's email. If already exists, the participant will be updated instead of created.
+            /// </summary>
             public string Email { get; set; }
         }
 

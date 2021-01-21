@@ -14,6 +14,9 @@ namespace Quizzy.WebApp.Features.Api.Competitions
     {
         public class Query : IRequest<Result>
         {
+            /// <summary>
+            /// The unique code for the Competition.
+            /// </summary>
             public string Code { get; set; }
         }
 

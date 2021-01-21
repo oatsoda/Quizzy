@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using MediatR;
-using Microsoft.Azure.Cosmos;
 using Quizzy.WebApp.Data.Entities;
 using Quizzy.WebApp.DomainInfrastructure;
 using System;

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
 {
-    public class Put
+    public class Post
     {
         public class Command : IRequest<Result>
         {
