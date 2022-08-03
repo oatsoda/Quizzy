@@ -7,8 +7,8 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
     {
         public MappingProfile()
         {
-            CreateMap<Put.Command, Competition>();
-            CreateMap<Competition, Put.Result>();
+            CreateMap<Post.Command, Competition>();
+            CreateMap<Competition, Post.Result>();
 
             CreateMap<Competition, Get.Result>();
         }

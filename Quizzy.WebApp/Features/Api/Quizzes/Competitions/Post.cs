@@ -56,7 +56,7 @@ namespace Quizzy.WebApp.Features.Api.Quizzes.Competitions
 
                 await m_UnfinishedCompetitionChecker.CheckForUnfinishedCompetitions(command.QuizId);
 
-                var competition = await Task.Run(() => new Competition(command.QuizId, m_CompetitionCodeGenerator));
+                var competition = new Competition(command.QuizId, m_CompetitionCodeGenerator);
                 competition = m_Mapper.Map(command, competition);
 
                 competition = await m_DataStore.Create(competition, competition.CompId);
